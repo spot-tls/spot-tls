@@ -4,6 +4,7 @@
  * Les modifications sont sauvegardées en localStorage (via saveEdit).
  */
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import './SpotEditor.css';
 
 const DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
@@ -76,7 +77,7 @@ export default function SpotEditor({ spot, onClose, onSave }) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="spe-overlay" onClick={onClose}>
       <div className="spe-sheet" onClick={(e) => e.stopPropagation()}>
 
@@ -203,6 +204,7 @@ export default function SpotEditor({ spot, onClose, onSave }) {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

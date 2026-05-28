@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CATEGORY_CONFIG } from '../../utils/config';
 import './AddSpotFlow.css';
 
@@ -56,7 +57,7 @@ export default function AddSpotFlow({ coords, onSave, onCancel }) {
 
   const valid = form.name.trim().length > 0;
 
-  return (
+  return createPortal(
     <div className="asf-overlay" onClick={onCancel}>
       <div className="asf-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="asf-handle" />
@@ -189,6 +190,7 @@ export default function AddSpotFlow({ coords, onSave, onCancel }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

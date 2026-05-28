@@ -104,10 +104,11 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       {/* ── Hero greeting ── */}
       <div className="hv-hero">
         <div className="hv-hero-glow" />
+        <div className="hv-hero-glow2" />
         <div className="hv-greeting">{text}</div>
         <div className="hv-greeting-sub">{sub}</div>
         <button className="hv-cta-map" onClick={onGoMap}>
-          🗺️ Voir tous les spots →
+          🗺️ Explorer les spots
         </button>
       </div>
 

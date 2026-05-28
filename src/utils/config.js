@@ -1,6 +1,18 @@
-// ── Pin / category styling ───────────────────────────────────────────────
-// Spec-mandated entries + the extra categories actually present in the data
-// so every pin gets a meaningful colour instead of falling back.
+// ── Couleurs par quartier ────────────────────────────────────
+export const QUARTIER_COLORS = {
+  'Capitole':       '#EC4899',
+  'Saint-Cyprien':  '#A78BFA',
+  'Carmes':         '#06B6D4',
+  'Centre-ville':   '#F59E0B',
+  'Wilson':         '#4ade80',
+  'Arnaud-Bernard': '#FB7185',
+  'Saint-Georges':  '#22D3EE',
+  'Saint-Aubin':    '#F472B6',
+  'Compans':        '#34D399',
+  'Minimes':        '#FBBF24',
+};
+
+// ── Pin / category styling ───────────────────────────────────
 export const CATEGORY_CONFIG = {
   'Bar / cocktails':     { color: '#A78BFA', gradient: 'linear-gradient(135deg,#A78BFA,#8B5CF6)', emoji: '🍸' },
   'Bar à cocktails':     { color: '#A78BFA', gradient: 'linear-gradient(135deg,#A78BFA,#8B5CF6)', emoji: '🍸' },
@@ -11,7 +23,6 @@ export const CATEGORY_CONFIG = {
   'Restaurant':          { color: '#FFB347', gradient: 'linear-gradient(135deg,#FFB347,#EA580C)', emoji: '🍽️' },
   'Escape game':         { color: '#4ade80', gradient: 'linear-gradient(135deg,#4ade80,#16A34A)', emoji: '🔐' },
   'Bowling / karting':   { color: '#22D3EE', gradient: 'linear-gradient(135deg,#22D3EE,#06B6D4)', emoji: '🎳' },
-  // extras present in the dataset
   'Bar à vin':           { color: '#F472B6', gradient: 'linear-gradient(135deg,#F472B6,#BE185D)', emoji: '🍷' },
   'Bar à jeux / Gaming': { color: '#34D399', gradient: 'linear-gradient(135deg,#34D399,#059669)', emoji: '🎮' },
   'Concerts / lives':    { color: '#FB7185', gradient: 'linear-gradient(135deg,#FB7185,#E11D48)', emoji: '🎤' },
@@ -25,9 +36,7 @@ export const getCatConfig = (cat) =>
 
 export const CLOSED_PIN_COLOR = '#6B5B7F';
 
-// ── Mood filters (killer feature) ────────────────────────────────────────
-// A spot matches a mood if at least one of its vibe_tags is in `keywords`
-// (lowercase .includes comparison). "bout" matches by category instead.
+// ── Mood filters ──────────────────────────────────────────────────────
 export const MOODS = [
   { key: 'chill',       label: 'Chill',         emoji: '🌿', keywords: ['cosy', 'calme', 'tranquille', 'lounge'] },
   { key: 'branche',     label: 'Branché',       emoji: '⚡', keywords: ['branché', 'hype', 'tendance', 'dj'] },

@@ -1,22 +1,10 @@
 import { useMemo, useState } from 'react';
-import { MOODS, getCatConfig, matchMood } from '../../utils/config';
+import { MOODS, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import SpotDetail from '../MapView/SpotDetail';
 import './HomeView.css';
 
-const QUARTIER_COLORS = {
-  'Capitole':       '#EC4899',
-  'Saint-Cyprien':  '#A78BFA',
-  'Carmes':         '#06B6D4',
-  'Centre-ville':   '#F59E0B',
-  'Wilson':         '#4ade80',
-  'Arnaud-Bernard': '#FB7185',
-  'Saint-Georges':  '#22D3EE',
-  'Saint-Aubin':    '#F472B6',
-  'Compans':        '#34D399',
-  'Minimes':        '#FBBF24',
-};
 
 function greeting() {
   const h = new Date().getHours();

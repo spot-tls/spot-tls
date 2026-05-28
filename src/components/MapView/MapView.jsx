@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
-import { getCatConfig, CLOSED_PIN_COLOR, MOODS, matchMood } from '../../utils/config';
+import { getCatConfig, CLOSED_PIN_COLOR, MOODS, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import SpotDetail from './SpotDetail';
@@ -9,19 +9,6 @@ import AddSpotFlow from './AddSpotFlow';
 import './MapView.css';
 
 const TOULOUSE = [43.6045, 1.4442];
-
-const QUARTIER_COLORS = {
-  'Capitole':       '#EC4899',
-  'Saint-Cyprien':  '#A78BFA',
-  'Carmes':         '#06B6D4',
-  'Centre-ville':   '#F59E0B',
-  'Wilson':         '#4ade80',
-  'Arnaud-Bernard': '#FB7185',
-  'Saint-Georges':  '#22D3EE',
-  'Saint-Aubin':    '#F472B6',
-  'Compans':        '#34D399',
-  'Minimes':        '#FBBF24',
-};
 
 const TLS_BOUNDS = L.latLngBounds([43.47, 1.22], [43.74, 1.65]);
 const TILE_DARK    = 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';

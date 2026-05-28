@@ -1,23 +1,11 @@
 import { useMemo, useState } from 'react';
-import { MOODS, CATEGORY_CONFIG, getCatConfig, matchMood } from '../../utils/config';
+import { MOODS, CATEGORY_CONFIG, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import { isOpenNow } from '../../utils/isOpenNow';
 import SpotCard from '../SpotCard/SpotCard';
 import SpotDetail from '../MapView/SpotDetail';
 import './SearchView.css';
 
-const QUARTIER_COLORS = {
-  'Capitole':       '#EC4899',
-  'Saint-Cyprien':  '#A78BFA',
-  'Carmes':         '#06B6D4',
-  'Centre-ville':   '#F59E0B',
-  'Wilson':         '#4ade80',
-  'Arnaud-Bernard': '#FB7185',
-  'Saint-Georges':  '#22D3EE',
-  'Saint-Aubin':    '#F472B6',
-  'Compans':        '#34D399',
-  'Minimes':        '#FBBF24',
-};
 
 const SORTS = [
   { key: 'pertinence', label: 'Pertinence' },

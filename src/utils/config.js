@@ -42,7 +42,7 @@ export const MOODS = [
   { key: 'branche',     label: 'Branché',       emoji: '⚡', keywords: ['branché', 'hype', 'tendance', 'dj'] },
   { key: 'chic',        label: 'Chic',          emoji: '💎', keywords: ['chic', 'élégant', 'rooftop', 'luxe'] },
   { key: 'underground', label: 'Underground',   emoji: '🎛️', keywords: ['underground', 'alternatif', 'techno', 'rave'] },
-  { key: 'terrasse',    label: 'Terrasse',      emoji: '🌅', keywords: ['terrasse', 'extérieur', 'rooftop'] },
+  { key: 'aprem',       label: 'Aprem',         emoji: '☀️', keywords: ['brunch', 'café', 'terrasse', 'extérieur', 'déjeuner', 'afterwork'] },
   { key: 'bout',        label: "Jusqu'au bout", emoji: '🔥', categories: ['Club / Soirée', 'Underground', 'Boîte / club'] },
 ];
 

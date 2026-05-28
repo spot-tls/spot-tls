@@ -91,12 +91,17 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
   const photos   = spot.photos?.length ? spot.photos : spot.photo_url ? [spot.photo_url] : [];
   const hasGallery = photos.length > 0;
 
+  const shareUrl = `https://trouvetonspott.netlify.app/?spot=${spot.id}`;
+  const shareText = `${spot.name} — ${spot.category}${spot.quartier ? ' · ' + spot.quartier : ''}\n📍 Découvre ce spot sur SpotTLS`;
   const share = async () => {
-    const text = spot.name + ' — ' + spot.category + (spot.quartier ? ' · ' + spot.quartier : '') + '\n' + mapsUrl;
     if (navigator.share) {
-      try { await navigator.share({ title: spot.name, text, url: mapsUrl }); } catch {}
+      try { await navigator.share({ title: spot.name, text: shareText, url: shareUrl }); } catch {}
     } else {
-      try { await navigator.clipboard.writeText(text); setShared(true); setTimeout(() => setShared(false), 2000); } catch {}
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch {}
     }
   };
 

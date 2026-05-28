@@ -55,7 +55,7 @@ export default function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenEvents={() => setShowEvents(true)}
-        onGoMap={goHome}
+        onGoMap={goMap}
       />
 
       {loading && centerScreen(<span>Chargement...</span>)}

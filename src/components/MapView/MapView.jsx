@@ -80,6 +80,19 @@ export default function MapView({
 
   const openSpot = (spot) => { setSelected(spot); };
 
+  // Deep link: ouvre le spot depuis l'URL (?spot=ID)
+  useEffect(() => {
+    if (!spots.length) return;
+    const params = new URLSearchParams(window.location.search);
+    const spotId = params.get('spot');
+    if (!spotId) return;
+    const target = spots.find((s) => String(s.id) === spotId);
+    if (target) {
+      setSelected(target);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [spots]);
+
   useEffect(() => {
     if (mapRef.current) return;
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';

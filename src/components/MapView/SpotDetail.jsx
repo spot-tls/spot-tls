@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { getCatConfig, MOODS, matchMood } from '../../utils/config';
 import { isOpenNow, getNextOpening } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
@@ -99,7 +100,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
     }
   };
 
-  return (
+  return createPortal(
     <div className="sd-overlay" onClick={onClose}>
       <div className="sd-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sd-handle" />
@@ -246,6 +247,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,0 +1,167 @@
+/* ──────────────────────────────────────
+   SpotCard — SpotFR
+   ────────────────────────────────────── */
+.spot-card {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.spot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.28), 0 0 0 1px rgba(167,139,250,0.2);
+  border-color: rgba(167,139,250,0.3);
+}
+
+.spot-card:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ── Thumbnail ── */
+.spot-card-emoji {
+  position: relative;
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+.spot-card-emoji img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spot-card-love {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  font-size: 11px;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.65));
+}
+
+/* ── Body ── */
+.spot-card-body {
+  flex: 1;
+  min-width: 0;
+  padding-right: 36px;
+}
+
+.spot-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.spot-card-name {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Status pill ── */
+.spot-card-status {
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.spot-card-status.on {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.spot-card-status.off {
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+}
+
+.spot-card-status.unknown {
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.04);
+  letter-spacing: 3px;
+  font-size: 8px;
+}
+
+/* ── Meta ── */
+.spot-card-meta {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spot-card-dist {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+/* ── Tags ── */
+.spot-card-tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.spot-card-tag {
+  font-size: 10.5px;
+  color: var(--secondary);
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.15);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+}
+
+/* ── Fav button ── */
+.spot-card-fav {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.spot-card-fav:hover {
+  transform: scale(1.2);
+  background: rgba(236,72,153,0.1);
+  border-color: rgba(236,72,153,0.25);
+}
+
+.spot-card-fav.active {
+  background: rgba(236,72,153,0.15);
+  border-color: rgba(236,72,153,0.3);
+}

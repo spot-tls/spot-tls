@@ -1,0 +1,306 @@
+/* ──────────────────────────────────────────────────────────────
+   QuartiersView — redesign immersif "Tout à la fois"
+   ────────────────────────────────────────────────────────────── */
+
+.quartiersview {
+  position: absolute;
+  inset: var(--topbar-h) 0 var(--bottomnav-h) 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── Chip bar ── */
+.qv-chipbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.qv-chipbar::-webkit-scrollbar { display: none; }
+
+.qv-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all .18s ease;
+  cursor: pointer;
+}
+.qv-chip:hover {
+  border-color: rgba(167,139,250,0.35);
+  color: var(--text);
+}
+.qv-chip.active {
+  background: rgba(167,139,250,0.14);
+  border-color: rgba(167,139,250,0.5);
+  color: var(--secondary);
+}
+.qv-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+/* ── Feed (scroll principal) ── */
+.qv-feed {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.qv-feed::-webkit-scrollbar { display: none; }
+
+/* ── Section quartier ── */
+.qv-section {
+  margin-bottom: 6px;
+}
+
+.qv-section-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  overflow: hidden;
+}
+
+.qv-section-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.qv-section-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+.qv-section-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.qv-section-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.qv-section-vibe {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qv-section-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.qv-stat-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.qv-stat-pill.open {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+}
+
+/* ── Horizontal scroll track ── */
+.qv-scroll-track {
+  display: flex;
+  gap: 12px;
+  padding: 4px 16px 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.qv-scroll-track::-webkit-scrollbar { display: none; }
+
+/* Separator between sections */
+.qv-section + .qv-section {
+  border-top: 1px solid var(--border);
+}
+
+/* ── Mini card ── */
+.qv-mini-card {
+  flex-shrink: 0;
+  width: 148px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.qv-mini-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  border-color: rgba(167,139,250,0.3);
+}
+.qv-mini-card:active {
+  transform: scale(0.97);
+}
+
+.qv-mini-thumb {
+  position: relative;
+  width: 100%;
+  height: 104px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qv-mini-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qv-mini-emoji {
+  font-size: 32px;
+}
+
+.qv-mini-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 6px 7px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 50%);
+}
+
+.qv-mini-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 100px;
+}
+.qv-mini-status.on  { background: rgba(74,222,128,0.22); color: #4ade80; }
+.qv-mini-status.off { background: rgba(0,0,0,0.35); color: rgba(255,255,255,0.45); }
+.qv-mini-status.unknown { display: none; }
+
+.qv-mini-fav {
+  font-size: 15px;
+  line-height: 1;
+  background: rgba(0,0,0,0.35);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qv-mini-info {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.qv-mini-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qv-mini-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.qv-mini-dist {
+  color: var(--text-dim);
+}
+
+.qv-mini-coup {
+  font-size: 10px;
+  color: #F472B6;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* ── Footer ── */
+.qv-feed-footer {
+  padding: 16px 16px 24px;
+  text-align: center;
+}
+.qv-feed-footer-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Light theme overrides ── */
+[data-theme="light"] .qv-mini-card {
+  background: #fff;
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .qv-mini-card:hover {
+  border-color: rgba(167,139,250,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+[data-theme="light"] .qv-stat-pill {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+  color: var(--text-muted);
+}
+[data-theme="light"] .qv-chip {
+  background: #f3f4f6;
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .qv-chip.active {
+  background: rgba(167,139,250,0.12);
+}

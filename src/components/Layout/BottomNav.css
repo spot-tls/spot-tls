@@ -1,0 +1,85 @@
+/* ──────────────────────────────────────
+   BottomNav — SpotFR
+   ────────────────────────────────────── */
+.bottomnav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--bottomnav-h);
+  z-index: 50;
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+}
+
+.bottomnav-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color .15s ease;
+}
+
+.bottomnav-tab.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.bottomnav-tab:hover:not(.active) {
+  color: var(--text-dim);
+}
+
+/* Active indicator bar at top */
+.bottomnav-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--gradient-brand);
+}
+
+.bottomnav-emoji {
+  position: relative;
+  font-size: 22px;
+  line-height: 1;
+  transition: filter .15s ease, transform .15s ease;
+}
+
+.bottomnav-tab.active .bottomnav-emoji {
+  transform: translateY(-1px);
+}
+
+.bottomnav-tab:not(.active) .bottomnav-emoji {
+  filter: grayscale(0.35) opacity(0.8);
+}
+
+.bottomnav-badge {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.bottomnav-label {
+  font-size: 11px;
+  letter-spacing: 0.01em;
+}

@@ -1,0 +1,205 @@
+[
+  {
+    "id": "evt_001",
+    "spot_name": "Le Rex",
+    "quartier": "Capitole",
+    "title": "Soirée Techno — Circuit Breaker",
+    "description": "Quatre heures de sets techno brutaux avec les meilleurs DJs de la scène locale. Soundsystem d'enfer, light show immersif.",
+    "category": "DJ Set",
+    "date": "2026-05-30",
+    "time_start": "23:00",
+    "time_end": "06:00",
+    "price": "€€",
+    "price_detail": "12€ / gratuit avant 23h30",
+    "tags": [
+      "techno",
+      "underground",
+      "dansant"
+    ],
+    "link": "https://ra.co",
+    "featured": true
+  },
+  {
+    "id": "evt_002",
+    "spot_name": "Le Bikini",
+    "quartier": "Saint-Cyprien",
+    "title": "Concert — Jungle",
+    "description": "Le duo britannique de funk et soul électronique s'arrête à Toulouse pour une soirée mémorable.",
+    "category": "Concert",
+    "date": "2026-05-31",
+    "time_start": "20:00",
+    "time_end": "23:30",
+    "price": "€€€",
+    "price_detail": "32€ en prévente",
+    "tags": [
+      "live-music",
+      "funk",
+      "soul"
+    ],
+    "link": "https://lebikini.com",
+    "featured": true
+  },
+  {
+    "id": "evt_003",
+    "spot_name": "Père Peinard",
+    "quartier": "Carmes",
+    "title": "Happy Hour · 18h–20h",
+    "description": "Cocktails signature à moitié prix tous les jours de 18h à 20h. Ambiance chill, terrasse ouverte.",
+    "category": "Happy Hour",
+    "date": "2026-05-29",
+    "time_start": "18:00",
+    "time_end": "20:00",
+    "price": "€",
+    "price_detail": "Cocktails à partir de 5€",
+    "tags": [
+      "cosy",
+      "terrasse",
+      "cocktails"
+    ],
+    "link": null,
+    "featured": false
+  },
+  {
+    "id": "evt_004",
+    "spot_name": "O'Brothers",
+    "quartier": "Wilson",
+    "title": "Afterwork Jazz · Live",
+    "description": "Trio de jazz en live chaque vendredi soir. Bières craft et ambiance feutrée.",
+    "category": "Concert",
+    "date": "2026-05-30",
+    "time_start": "19:00",
+    "time_end": "22:00",
+    "price": "€",
+    "price_detail": "Entrée gratuite · conso obligatoire",
+    "tags": [
+      "jazz",
+      "live-music",
+      "afterwork"
+    ],
+    "link": null,
+    "featured": false
+  },
+  {
+    "id": "evt_005",
+    "spot_name": "La Maison",
+    "quartier": "Saint-Georges",
+    "title": "Soirée Rooftop · Sunset",
+    "description": "DJ set ambient & house sur le rooftop avec vue panoramique sur Toulouse. Cocktails de saison.",
+    "category": "DJ Set",
+    "date": "2026-05-31",
+    "time_start": "18:30",
+    "time_end": "22:00",
+    "price": "€€",
+    "price_detail": "Entrée libre",
+    "tags": [
+      "rooftop",
+      "house",
+      "chic"
+    ],
+    "link": null,
+    "featured": true
+  },
+  {
+    "id": "evt_006",
+    "spot_name": "Aux P'tits Soins",
+    "quartier": "Arnaud-Bernard",
+    "title": "Brunch du Dimanche",
+    "description": "Buffet brunch fait maison de 10h à 15h. Formule illimitée avec boissons chaudes.",
+    "category": "Brunch",
+    "date": "2026-06-01",
+    "time_start": "10:00",
+    "time_end": "15:00",
+    "price": "€€",
+    "price_detail": "22€ tout compris",
+    "tags": [
+      "brunch",
+      "cosy",
+      "dimanche"
+    ],
+    "link": null,
+    "featured": false
+  },
+  {
+    "id": "evt_007",
+    "spot_name": "Le Rex",
+    "quartier": "Capitole",
+    "title": "Club Night · House & Disco",
+    "description": "Nuit house et disco avec des sets de DJ invités parisiens. Dancefloor libéré dès minuit.",
+    "category": "DJ Set",
+    "date": "2026-06-06",
+    "time_start": "23:00",
+    "time_end": "07:00",
+    "price": "€€",
+    "price_detail": "15€ · gratuit liste guest",
+    "tags": [
+      "house",
+      "disco",
+      "dansant",
+      "tardif"
+    ],
+    "link": "https://ra.co",
+    "featured": false
+  },
+  {
+    "id": "evt_008",
+    "spot_name": "Bazacle",
+    "quartier": "Saint-Cyprien",
+    "title": "Expo Photo · Toulouse de Nuit",
+    "description": "Vernissage de l'expo photo de 10 artistes toulousains capturant la ville la nuit. Verre offert.",
+    "category": "Expo",
+    "date": "2026-06-05",
+    "time_start": "19:00",
+    "time_end": "22:00",
+    "price": "€",
+    "price_detail": "Entrée libre",
+    "tags": [
+      "expo",
+      "culture",
+      "vernissage"
+    ],
+    "link": null,
+    "featured": false
+  },
+  {
+    "id": "evt_009",
+    "spot_name": "Bodega Bodega",
+    "quartier": "Centre-ville",
+    "title": "Fiesta Latino · Salsa Night",
+    "description": "Cours de salsa dès 21h, puis soirée latino jusqu'à 3h du matin. DJ spécialisé. Ambiance garantie !",
+    "category": "Soirée",
+    "date": "2026-05-29",
+    "time_start": "21:00",
+    "time_end": "03:00",
+    "price": "€",
+    "price_detail": "Entrée libre",
+    "tags": [
+      "latino",
+      "salsa",
+      "dansant",
+      "festif"
+    ],
+    "link": null,
+    "featured": true
+  },
+  {
+    "id": "evt_010",
+    "spot_name": "Chez Tonton",
+    "quartier": "Capitole",
+    "title": "Quiz Night · Le Grand Quizz",
+    "description": "Soirée quiz en équipes de 4. Lots à gagner pour les meilleurs ! Inscription avant 20h.",
+    "category": "Soirée",
+    "date": "2026-06-03",
+    "time_start": "20:00",
+    "time_end": "23:00",
+    "price": "€",
+    "price_detail": "Entrée libre · boissons à la carte",
+    "tags": [
+      "quiz",
+      "pub",
+      "fun",
+      "étudiant"
+    ],
+    "link": null,
+    "featured": false
+  }
+]

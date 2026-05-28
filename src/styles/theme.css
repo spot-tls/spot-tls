@@ -1,0 +1,55 @@
+/* ─────────────────────────────────────────────────────────────
+   SpotFR — Design tokens
+   ───────────────────────────────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+  /* Surfaces */
+  --bg:           #0F0E15;
+  --bg-elevated:  #1A1825;
+  --bg-soft:      #15121F;
+
+  /* Brand */
+  --primary:      #EC4899;
+  --secondary:    #A78BFA;
+  --gradient-brand: linear-gradient(135deg, #EC4899, #A78BFA);
+
+  /* Status */
+  --green:        #4ade80;
+  --green-soft:   rgba(74, 222, 128, 0.15);
+
+  /* Text */
+  --text:         #F5F0FF;
+  --text-dim:     #B8B2CC;
+  --text-muted:   #6B6880;
+
+  /* Lines / glass */
+  --border:       rgba(255, 255, 255, 0.08);
+  --glass:        rgba(15, 14, 21, 0.85);
+  --glass-soft:   rgba(26, 24, 37, 0.7);
+
+  /* Radii */
+  --radius-pill:  9999px;
+  --radius-lg:    24px;
+  --radius-md:    16px;
+
+  /* Fonts */
+  --font-title: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body:  'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Layout — inclut safe area iOS */
+  --topbar-h:    calc(60px + env(safe-area-inset-top, 0px));
+  --bottomnav-h: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Light theme (used for map tile switching demo) */
+[data-theme='light'] {
+  --bg:          #F7F5FB;
+  --bg-elevated: #FFFFFF;
+  --bg-soft:     #EFEBF5;
+  --text:        #1A1825;
+  --text-dim:    #4A4660;
+  --text-muted:  #8A86A0;
+  --border:      rgba(0, 0, 0, 0.08);
+  --glass:       rgba(247, 245, 251, 0.85);
+  --glass-soft:  rgba(255, 255, 255, 0.7);
+}

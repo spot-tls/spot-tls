@@ -1,0 +1,77 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-title); font-weight: 700; }
+
+button { font-family: var(--font-body); cursor: pointer; border: none; background: none; color: inherit; }
+input  { font-family: var(--font-body); }
+a { color: inherit; }
+
+::-webkit-scrollbar { width: 0; height: 0; }
+* { scrollbar-width: none; }
+
+/* Pill button — brand gradient */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 11px 20px;
+  white-space: nowrap;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  box-shadow: 0 4px 18px rgba(236, 72, 153, 0.32);
+}
+.btn-pill:hover  { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(236, 72, 153, 0.42); }
+.btn-pill:active { transform: translateY(0); }
+.btn-pill:disabled { opacity: .6; cursor: default; }
+
+/* Generic glass surface */
+.glass {
+  background: var(--glass-soft);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.5); opacity: .55; }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* The app shell scroll regions sit between the fixed bars */
+.page-scroll {
+  position: absolute;
+  inset: var(--topbar-h) 0 var(--bottomnav-h) 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

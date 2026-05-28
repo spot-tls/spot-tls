@@ -55,6 +55,7 @@ export default function MapView({
   const layerRef = useRef(null);
   const userRef  = useRef(null);
   const placingMarkerRef = useRef(null);
+  const roRef   = useRef(null);
 
   const [openOnly,    setOpenOnly]    = useState(false);
   const [mood,        setMood]        = useState(null);
@@ -94,6 +95,15 @@ export default function MapView({
     const layer = L.layerGroup().addTo(map);
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
+
+    // Rappel invalidateSize chaque fois que le conteneur redevient visible
+    // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)
+    roRef.current = new ResizeObserver(() => {
+      if (mapEl.current?.offsetWidth > 0) map.invalidateSize();
+    });
+    roRef.current.observe(mapEl.current);
+
+    return () => roRef.current?.disconnect();
   }, []);
 
   useEffect(() => {

@@ -127,7 +127,8 @@
   margin-top: -2px;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
 }
-.spot-pin-wrap:hover .spot-pin { transform: scale(1.15) translateY(-3px); cursor: pointer; }
+.spot-pin-wrap { touch-action: manipulation; cursor: pointer; }
+.spot-pin-wrap:hover .spot-pin { transform: scale(1.15) translateY(-3px); }
 
 /* ───────── SpotDetail — glassmorphism premium ───────── */
 .sd-overlay {

@@ -282,20 +282,25 @@ export default function MapView({
                         <div className="map-list-body">
                           <div className="map-list-top">
                             <span className="map-list-name">{s.name}</span>
-                            {s.google_rating >= 4.5 && <span className="ml-coup">❤️</span>}
                           </div>
                           <div className="map-list-meta">
                             <span style={{ color: cat.color }}>{cat.emoji} {s.category}</span>
                           </div>
                           <div className="ml-card-footer">
-                            {s.google_rating && <span className="ml-rating">⭐ {s.google_rating}</span>}
-                            {dist != null && <span className="ml-dist">📍 {formatDistance(dist)}</span>}
                             {open !== null && (
                               <span className={`ml-status ${open ? 'on' : 'off'}`}>
                                 {open ? 'Ouvert' : 'Fermé'}
                               </span>
                             )}
+                            {dist != null && <span className="ml-dist">📍 {formatDistance(dist)}</span>}
                           </div>
+                        </div>
+                        <div className="ml-card-right">
+                          {s.google_rating
+                            ? <div className="ml-rating-badge">⭐ {s.google_rating}</div>
+                            : null}
+                          {s.google_rating >= 4.5 && <div className="ml-coup-badge">❤️</div>}
+                          <span className="ml-chevron">›</span>
                         </div>
                       </button>
                     );

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="42" fill="#0F0E15"/>
+  <!-- Pin body -->
+  <ellipse cx="96" cy="82" rx="34" ry="34" fill="url(#g)"/>
+  <!-- Pin tail -->
+  <polygon points="80,106 112,106 96,138" fill="url(#g)"/>
+  <!-- S letter -->
+  <text x="96" y="93" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-weight="800" font-size="28" fill="white">S</text>
+</svg>

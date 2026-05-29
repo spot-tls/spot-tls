@@ -52,5 +52,4 @@ export function matchMood(spot, moodKey) {
   if (!mood) return true;
   if (mood.categories) return mood.categories.includes(spot.category);
   const tags = (spot.vibe_tags || []).map((t) => t.toLowerCase());
-  return mood.keywords.some((kw) => tags.some((t) => t.includes(kw)));
-}
+  return mood.keywords.some((kw) => t

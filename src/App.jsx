@@ -10,6 +10,7 @@ import EventsView from './components/EventsView/EventsView';
 import BetaModal from './components/BetaModal/BetaModal';
 import SplashScreen from './components/Onboarding/SplashScreen';
 import { useSpots } from './hooks/useSpots';
+import { updateSpotCoords } from './lib/supabaseAdmin';
 import { useFavorites } from './hooks/useFavorites';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useTheme } from './hooks/useTheme';
@@ -24,7 +25,8 @@ export default function App() {
   const [showEvents,  setShowEvents]  = useState(false);
   const dismissSplash = () => setShowSplash(false);
 
-  const { spots, loading, error }                          = useSpots();
+  const { spots, loading, error, removeSpot, moveSpot }    = useSpots();
+  const [repositioningSpot, setRepositioningSpot]          = useState(null);
   const { favoriteIds, isFavorite, toggleFavorite, count } = useFavorites();
   const { position: userPos, status: geoStatus, locate }   = useGeolocation();
   const { theme, toggleTheme }                             = useTheme();
@@ -87,6 +89,15 @@ export default function App() {
               onEditSpot={saveEdit}
               admin={admin}
               onAddSpot={addSpot}
+              onDeleteSpot={removeSpot}
+              repositioningSpot={repositioningSpot}
+              onStartReposition={(spot) => { setRepositioningSpot(spot); setActivePage('map'); }}
+              onRepositionSave={async (lat, lng) => {
+                  try { await updateSpotCoords(repositioningSpot.id, lat, lng); } catch (e) { console.error('Reposition error:', e); }
+                  moveSpot(repositioningSpot.id, lat, lng);
+                  setRepositioningSpot(null);
+                }}
+              onRepositionCancel={() => setRepositioningSpot(null)}
             />
           </div>
 

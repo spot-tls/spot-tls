@@ -580,38 +580,4 @@
   background: linear-gradient(135deg, #4ade80, #22D3EE);
   color: #0a0a10;
   font-size: 28px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 20px rgba(74, 222, 128, 0.45);
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.admin-add-btn:hover {
-  transform: scale(1.07);
-  box-shadow: 0 6px 26px rgba(74, 222, 128, 0.6);
-}
-.admin-add-btn:active { transform: scale(0.94); }
-
-.admin-placing-banner {
-  position: absolute;
-  top: 60px; left: 50%; transform: translateX(-50%);
-  z-index: 900;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 18px;
-  background: rgba(10, 10, 20, 0.92);
-  border: 1px solid rgba(74, 222, 128, 0.45);
-  border-radius: 100px;
-  color: #4ade80;
-  font-size: 13px; font-weight: 700;
-  backdrop-filter: blur(8px);
-  white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-.admin-placing-banner button {
-  font-size: 12px; font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  padding: 3px 10px;
-  border-radius: 100px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  transition: color .15s;
-}
-.admin-placing-banner button:hover { color: var(--text); }
+  display: flex; align-it

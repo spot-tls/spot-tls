@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { deleteSpot, updateSpotCoords } from '../../lib/supabaseAdmin';
 import { getCatConfig, MOODS, matchMood } from '../../utils/config';
 import { isOpenNow, getNextOpening } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
@@ -72,8 +73,23 @@ function PhotoGallery({ photos, name }) {
   );
 }
 
-export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite, userPos, onEdit }) {
-  const [shared, setShared] = useState(false);
+export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite, userPos, onEdit, onReposition, onDelete }) {
+  const [shared,    setShared]    = useState(false);
+  const [confirmDel, setConfirmDel] = useState(false);
+  const [deleting,   setDeleting]   = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirmDel) { setConfirmDel(true); return; }
+    setDeleting(true);
+    try {
+      await deleteSpot(spot.id);
+      onDelete?.(spot.id);
+      onClose();
+    } catch (e) {
+      alert('Erreur suppression : ' + e.message);
+      setDeleting(false);
+    }
+  };
   if (!spot) return null;
 
   const cat      = getCatConfig(spot.category);
@@ -243,16 +259,4 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
             </div>
           )}
           <div className="sd-actions">
-            <a className="sd-btn sd-btn-primary" href={mapsUrl} target="_blank" rel="noreferrer">🧭 Itinéraire</a>
-            {resaUrl && <a className="sd-btn sd-btn-resa" href={resaUrl} target="_blank" rel="noreferrer">🗓️ Réserver</a>}
-            {telUrl  && <a className="sd-btn" href={telUrl}>📞 Appeler</a>}
-            <button className="sd-btn" onClick={share}>{shared ? '✓ Copié' : '↗ Partager'}</button>
-            {instaUrl && <a className="sd-btn" href={instaUrl} target="_blank" rel="noreferrer">📸 Instagram</a>}
-            {siteUrl  && <a className="sd-btn" href={siteUrl}  target="_blank" rel="noreferrer">🌐 Site web</a>}
-          </div>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-}
+            <a cla

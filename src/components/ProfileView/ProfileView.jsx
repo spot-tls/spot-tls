@@ -219,23 +219,4 @@ export default function ProfileView({
             </div>
           </div>
           <button className="pv-row" onClick={onSecretTap}>
-            <div className="pv-row-left">
-              <span className="pv-row-icon">{admin ? '🟢' : '🔒'}</span>
-              <div>
-                <div className="pv-row-label">{admin ? 'Admin activé — retaper pour désactiver' : 'Activer le mode admin'}</div>
-                <div className="pv-row-sub">Tap × 5 pour basculer</div>
-              </div>
-            </div>
-            <span className="pv-row-chevron">›</span>
-          </button>
-        </div>
-
-        <div className="pv-footer">
-          <div className="pv-footer-logo">Spot<span>TLS</span></div>
-          <div className="pv-footer-version">Beta v0.9 · Toulouse</div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
+            <div c

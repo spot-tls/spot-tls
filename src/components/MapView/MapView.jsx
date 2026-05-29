@@ -46,7 +46,8 @@ const placingIcon = L.divIcon({
 
 export default function MapView({
   spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onEditSpot,
-  admin, onAddSpot,
+  admin, onAddSpot, onDeleteSpot,
+  repositioningSpot, onStartReposition, onRepositionSave, onRepositionCancel,
 }) {
   const mapEl   = useRef(null);
   const mapRef  = useRef(null);
@@ -154,6 +155,21 @@ export default function MapView({
       userRef.current.setLatLng([userPos.lat, userPos.lng]);
     }
   }, [userPos]);
+
+  // Mode repositionnement
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!repositioningSpot) return;
+    map.getContainer().style.cursor = 'crosshair';
+    const handleClick = (e) => {
+      const { lat, lng } = e.latlng;
+      map.getContainer().style.cursor = '';
+      onRepositionSave?.(lat, lng);
+    };
+    map.once('click', handleClick);
+    return () => { map.off('click', handleClick); map.getContainer().style.cursor = ''; };
+  }, [repositioningSpot]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -347,6 +363,13 @@ export default function MapView({
         </div>
       )}
 
+      {repositioningSpot && (
+        <div className="admin-placing-banner">
+          <span>📍 Tape l'emplacement exact de <strong>{repositioningSpot.name}</strong></span>
+          <button onClick={onRepositionCancel}>Annuler</button>
+        </div>
+      )}
+
       {selected && (
         <SpotDetail
           spot={selected}
@@ -355,6 +378,8 @@ export default function MapView({
           onToggleFavorite={onToggleFavorite}
           userPos={userPos}
           onEdit={(s) => setEditingSpot(s)}
+          onReposition={admin ? onStartReposition : undefined}
+          onDelete={admin ? onDeleteSpot : undefined}
         />
       )}
 

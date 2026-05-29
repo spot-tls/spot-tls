@@ -26,24 +26,4 @@ export function useSpots() {
         if (valid.length === 0) throw new Error('Supabase vide — bascule locale.');
         setSpots(valid);
       } catch (e) {
-        // Fallback : données locales packagées au build
-        console.warn('[useSpots] Supabase indisponible, données locales utilisées :', e.message);
-        const valid = spotsData.filter(
-          (s) => typeof s.lat === 'number' && typeof s.lng === 'number'
-            && !Number.isNaN(s.lat) && !Number.isNaN(s.lng)
-        );
-        if (valid.length === 0) {
-          setError('Aucun spot disponible pour le moment.');
-        } else {
-          setSpots(valid);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadSpots();
-  }, []);
-
-  return { spots, loading, error };
-}
+        // Fallback : do

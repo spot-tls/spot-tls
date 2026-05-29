@@ -187,10 +187,4 @@ export default function AddSpotFlow({ coords, onSave, onCancel }) {
           <button className="asf-btn-cancel" onClick={onCancel}>Annuler</button>
           <button className="asf-btn-save" onClick={handleSave} disabled={!valid}>
             ➕ Créer le spot
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-}
+          </

@@ -259,4 +259,32 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
             </div>
           )}
           <div className="sd-actions">
-            <a cla
+            <a className="sd-btn sd-btn-primary" href={mapsUrl} target="_blank" rel="noreferrer">🧭 Itinéraire</a>
+            {resaUrl && <a className="sd-btn sd-btn-resa" href={resaUrl} target="_blank" rel="noreferrer">🗓️ Réserver</a>}
+            {telUrl  && <a className="sd-btn" href={telUrl}>📞 Appeler</a>}
+            <button className="sd-btn" onClick={share}>{shared ? '✓ Copié' : '↗ Partager'}</button>
+            {instaUrl && <a className="sd-btn" href={instaUrl} target="_blank" rel="noreferrer">📸 Instagram</a>}
+            {siteUrl  && <a className="sd-btn" href={siteUrl}  target="_blank" rel="noreferrer">🌐 Site web</a>}
+          </div>
+
+          {onReposition && (
+            <div className="sd-admin-actions">
+              <button className="sd-admin-btn sd-reposition-btn" onClick={() => { onClose(); onReposition(spot); }}>
+                📍 Repositionner
+              </button>
+              <button
+                className={`sd-admin-btn sd-delete-btn${confirmDel ? ' confirm' : ''}`}
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? '...' : confirmDel ? '⚠️ Confirmer la suppression' : '🗑️ Supprimer'}
+              </button>
+              {confirmDel && <button className="sd-admin-btn" onClick={() => setConfirmDel(false)}>Annuler</button>}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}

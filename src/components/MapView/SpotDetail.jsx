@@ -91,7 +91,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
   const photos   = spot.photos?.length ? spot.photos : spot.photo_url ? [spot.photo_url] : [];
   const hasGallery = photos.length > 0;
 
-  const shareUrl = `https://trouvetonspott.netlify.app/?spot=${spot.id}`;
+  const shareUrl = `https://spot-tls.vercel.app/?spot=${spot.id}`;
   const shareText = `${spot.name} — ${spot.category}${spot.quartier ? ' · ' + spot.quartier : ''}\n📍 Découvre ce spot sur SpotTLS`;
   const share = async () => {
     if (navigator.share) {

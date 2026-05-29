@@ -12,7 +12,7 @@ const FILTERS = [
   { key: 'distance', label: '📍 Proches' },
 ];
 
-export default function FavoritesView({ spots, favoriteIds, isFavorite, onToggleFavorite, userPos, onGoSearch }) {
+export default function FavoritesView({ spots, favoriteIds, isFavorite, onToggleFavorite, userPos, onGoSearch, admin, onAdminReposition, onAdminDelete }) {
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState('all');
 
@@ -134,6 +134,8 @@ export default function FavoritesView({ spots, favoriteIds, isFavorite, onToggle
           isFavorite={isFavorite}
           onToggleFavorite={onToggleFavorite}
           userPos={userPos}
+          onReposition={admin ? onAdminReposition : undefined}
+          onDelete={admin ? onAdminDelete : undefined}
         />
       )}
     </div>

@@ -43,7 +43,7 @@ function QSpotCard({ spot, onClick, userPos }) {
   );
 }
 
-export default function SearchView({ spots, isFavorite, onToggleFavorite, userPos }) {
+export default function SearchView({ spots, isFavorite, onToggleFavorite, userPos, admin, onAdminReposition, onAdminDelete }) {
   const [query,    setQuery]    = useState('');
   const [mood,     setMood]     = useState(null);
   const [category, setCategory] = useState(null);
@@ -273,6 +273,8 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
           isFavorite={isFavorite}
           onToggleFavorite={onToggleFavorite}
           userPos={userPos}
+          onReposition={admin ? onAdminReposition : undefined}
+          onDelete={admin ? onAdminDelete : undefined}
         />
       )}
     </div>

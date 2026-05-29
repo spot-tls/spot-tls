@@ -114,7 +114,7 @@ function EventPill({ event, onClick }) {
   );
 }
 
-export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, onGoMap, onOpenEvents }) {
+export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, onGoMap, onOpenEvents, admin, onAdminReposition, onAdminDelete }) {
   const [activeMood, setActiveMood] = useState(null);
   const [selected,   setSelected]   = useState(null);
   const { text, sub } = greeting();
@@ -241,6 +241,8 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
           isFavorite={isFavorite}
           onToggleFavorite={onToggleFavorite}
           userPos={userPos}
+          onReposition={admin ? onAdminReposition : undefined}
+          onDelete={admin ? onAdminDelete : undefined}
         />
       )}
     </div>

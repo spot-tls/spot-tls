@@ -75,6 +75,9 @@ export default function App() {
               userPos={userPos}
               onGoMap={goMap}
               onOpenEvents={() => setShowEvents(true)}
+              admin={admin}
+              onAdminReposition={(spot) => { setRepositioningSpot(spot); setActivePage('map'); }}
+              onAdminDelete={removeSpot}
             />
           )}
 
@@ -107,6 +110,9 @@ export default function App() {
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
               userPos={userPos}
+              admin={admin}
+              onAdminReposition={(spot) => { setRepositioningSpot(spot); setActivePage('map'); }}
+              onAdminDelete={removeSpot}
             />
           )}
 
@@ -118,6 +124,9 @@ export default function App() {
               onToggleFavorite={toggleFavorite}
               userPos={userPos}
               onGoSearch={() => setActivePage('search')}
+              admin={admin}
+              onAdminReposition={(spot) => { setRepositioningSpot(spot); setActivePage('map'); }}
+              onAdminDelete={removeSpot}
             />
           )}
 

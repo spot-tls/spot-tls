@@ -17,16 +17,26 @@ const LABELS_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}
 const LABELS_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
 const TILE_ATTR    = '&copy; OpenStreetMap &copy; CARTO';
 
-function pinHtml(spot, open) {
+function pinHtml(spot, open, compact) {
   const cat = getCatConfig(spot.category);
   const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
   const confirmed_closed = hasHours && open === false;
+  const opacity = confirmed_closed ? 0.5 : 1;
+  const isNew = spot._isNew;
+
+  if (compact) {
+    const color = confirmed_closed ? '#4a4060' : cat.color;
+    return (
+      '<div class="spot-dot" style="background:' + color + ';opacity:' + opacity + ';'
+      + (isNew ? 'border:2px solid #4ade80;' : '') + '"></div>'
+    );
+  }
+
   const bg = confirmed_closed ? CLOSED_PIN_COLOR : cat.gradient;
   const tailColor = confirmed_closed ? '#4a4060' : cat.color;
-  const opacity = confirmed_closed ? 0.5 : 1;
-  const isNew = spot._isNew ? 'border:2px solid #4ade80;' : '';
   return (
-    '<div class="spot-pin" style="background:' + bg + ';opacity:' + opacity + ';' + isNew + '">'
+    '<div class="spot-pin" style="background:' + bg + ';opacity:' + opacity + ';'
+    + (isNew ? 'border:2px solid #4ade80;' : '') + '">'
     + '<span class="spot-pin-emoji">' + cat.emoji + '</span></div>'
     + '<div class="spot-pin-tail" style="border-top-color:' + tailColor + ';opacity:' + opacity + '"></div>'
   );
@@ -66,6 +76,7 @@ export default function MapView({
   const [editingSpot, setEditingSpot] = useState(null);
   const [placing,     setPlacing]     = useState(false);
   const [newCoords,   setNewCoords]   = useState(null);
+  const [zoom,        setZoom]        = useState(14);
 
   const categories = useMemo(() => {
     const counts = {};
@@ -109,6 +120,7 @@ export default function MapView({
     const layer = L.layerGroup().addTo(map);
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
+    map.on('zoomend', () => setZoom(map.getZoom()));
 
     // Rappel invalidateSize chaque fois que le conteneur redevient visible
     // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)
@@ -134,18 +146,20 @@ export default function MapView({
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
+    const compact = zoom < 15;
     layer.clearLayers();
     filtered.forEach((spot) => {
       const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
       const open = hasHours ? isOpenNow(spot) : null;
       const icon = L.divIcon({
-        className: 'spot-pin-wrap',
-        html: pinHtml(spot, open),
-        iconSize: [34, 46], iconAnchor: [17, 46],
+        className: compact ? 'spot-dot-wrap' : 'spot-pin-wrap',
+        html: pinHtml(spot, open, compact),
+        iconSize: compact ? [12, 12] : [30, 40],
+        iconAnchor: compact ? [6, 6] : [15, 40],
       });
       L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => openSpot(spot));
     });
-  }, [filtered]);
+  }, [filtered, zoom]);
 
   useEffect(() => {
     if (!mapRef.current || !userPos) return;

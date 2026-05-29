@@ -12,13 +12,8 @@ export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents,
       </button>
 
       <div className="topbar-actions">
-        <button
-          className="topbar-theme-btn"
-          onClick={onOpenEvents}
-          aria-label="Événements"
-          title="Agenda des sorties"
-        >
-          🎫
+        <button className="topbar-agenda-btn" onClick={onOpenEvents} aria-label="Ouvrir l'agenda">
+          🎫 <span>Agenda</span>
         </button>
         <button
           className="topbar-theme-btn"
@@ -28,7 +23,7 @@ export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents,
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
         <button className="btn-pill topbar-beta" onClick={onJoinBeta}>
-          Rejoindre la bêta
+          Bêta
         </button>
       </div>
     </header>

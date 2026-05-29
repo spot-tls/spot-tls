@@ -72,6 +72,7 @@ export default function App() {
               onToggleFavorite={toggleFavorite}
               userPos={userPos}
               onGoMap={goMap}
+              onOpenEvents={() => setShowEvents(true)}
             />
           )}
 

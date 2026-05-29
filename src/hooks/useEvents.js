@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../lib/supabase';
 import eventsData from '../data/events.json';
 
 const TODAY = new Date();
@@ -6,43 +7,84 @@ TODAY.setHours(0, 0, 0, 0);
 
 function parseDate(str) {
   const [y, m, d] = str.split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  return date;
+  return new Date(y, m - 1, d);
 }
 
-function isTonight(dateStr) {
-  const d = parseDate(dateStr);
-  return d.toDateString() === TODAY.toDateString();
+function dateToIso(date) {
+  return date.toISOString().slice(0, 10);
 }
 
-function isWeekend(dateStr) {
-  const d = parseDate(dateStr);
-  const day = d.getDay(); // 0=Sun 6=Sat
-  return day === 5 || day === 6 || day === 0;
-}
-
-function isThisWeek(dateStr) {
-  const d = parseDate(dateStr);
-  const diffMs = d - TODAY;
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-  return diffDays >= 0 && diffDays < 7;
+function getWeekDays() {
+  const today = new Date();
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
 }
 
 export function useEvents() {
-  const [filter, setFilter] = useState('all'); // 'all' | 'tonight' | 'weekend' | 'week'
+  const [allEvents, setAllEvents] = useState([]);
+  const [activeDay,  setActiveDay]  = useState(dateToIso(TODAY));
+  const [activeCategory, setActiveCategory] = useState('all');
+  const weekDays = useMemo(() => getWeekDays(), []);
 
-  const events = useMemo(() => {
-    return eventsData
-      .filter((e) => parseDate(e.date) >= TODAY)
-      .sort((a, b) => parseDate(a.date) - parseDate(b.date));
+  useEffect(() => {
+    async function load() {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .gte('date', dateToIso(TODAY))
+          .order('date', { ascending: true })
+          .order('time_start', { ascending: true });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setAllEvents(data);
+        } else {
+          throw new Error('Supabase events vide');
+        }
+      } catch (e) {
+        console.warn('[useEvents] fallback local:', e.message);
+        const valid = eventsData.filter(e => parseDate(e.date) >= TODAY);
+        valid.sort((a, b) => parseDate(a.date) - parseDate(b.date));
+        setAllEvents(valid);
+      }
+    }
+    load();
   }, []);
 
   const filtered = useMemo(() => {
-    if (filter === 'tonight') return events.filter((e) => isTonight(e.date));
-    if (filter === 'weekend') return events.filter((e) => isWeekend(e.date));
-    if (filter === 'week')    return events.filter((e) => isThisWeek(e.date));
-    return events;
-  }, [events, filter]);
+    return allEvents.filter(e => {
+      const matchDay = e.date === activeDay;
+      const matchCat = activeCategory === 'all' || e.category === activeCategory;
+      return matchDay && matchCat;
+    });
+  }, [allEvents, activeDay, activeCategory]);
 
-  return { events: filtered, allEvents: events, filter, setFilter };
+  const categories = useMemo(() => {
+    const cats = new Set(allEvents.map(e => e.category).filter(Boolean));
+    return ['all', ...cats];
+  }, [allEvents]);
+
+  const hasDayEvents = useMemo(() => {
+    const map = {};
+    allEvents.forEach(e => { map[e.date] = true; });
+    return map;
+  }, [allEvents]);
+
+  return {
+    events: filtered,
+    allEvents,
+    weekDays,
+    activeDay,
+    setActiveDay,
+    activeCategory,
+    setActiveCategory,
+    categories,
+    hasDayEvents,
+  };
 }

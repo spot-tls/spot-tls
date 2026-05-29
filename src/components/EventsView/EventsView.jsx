@@ -1,67 +1,54 @@
+import { createPortal } from 'react-dom';
 import { useEvents } from '../../hooks/useEvents';
 import './EventsView.css';
 
-const CATEGORY_EMOJI = {
-  'DJ Set':     '🎛️',
-  'Concert':    '🎤',
-  'Happy Hour': '🍹',
-  'Soirée':     '🎉',
-  'Expo':       '🎭',
-  'Brunch':     '☕',
+const DAY_LABELS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+
+const CAT_CONFIG = {
+  'all':        { label: 'Tous',       emoji: '🗓️', color: '#EC4899' },
+  'DJ Set':     { label: 'DJ Set',     emoji: '🎛️', color: '#A78BFA' },
+  'Concert':    { label: 'Concert',    emoji: '🎤', color: '#FB7185' },
+  'Happy Hour': { label: 'Happy Hour', emoji: '🍹', color: '#06B6D4' },
+  'Soirée':     { label: 'Soirée',     emoji: '🎉', color: '#EC4899' },
+  'Brunch':     { label: 'Brunch',     emoji: '☕', color: '#4ade80' },
+  'Expo':       { label: 'Expo',       emoji: '🎭', color: '#FBBF24' },
 };
 
-const CAT_COLOR = {
-  'DJ Set':     '#A78BFA',
-  'Concert':    '#FB7185',
-  'Happy Hour': '#06B6D4',
-  'Soirée':     '#EC4899',
-  'Expo':       '#FBBF24',
-  'Brunch':     '#4ade80',
-};
-
-function formatDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const diff = Math.round((date - today) / 86400000);
-  if (diff === 0) return "Ce soir";
-  if (diff === 1) return "Demain";
-  return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+function getCat(key) {
+  return CAT_CONFIG[key] ?? { label: key, emoji: '📅', color: '#A78BFA' };
 }
 
-function EventCard({ event }) {
-  const emoji = CATEGORY_EMOJI[event.category] || '📅';
-  const color = CAT_COLOR[event.category] || '#A78BFA';
+function FeaturedCard({ event }) {
+  const cat = getCat(event.category);
+  const bg = event.photo_url
+    ? `url(${event.photo_url}) center/cover no-repeat`
+    : 'linear-gradient(160deg,#1a1035,#2d1052,#3b0764)';
 
   return (
-    <div className="ev-card">
-      {event.featured && <div className="ev-featured-badge">✨ À ne pas manquer</div>}
-      <div className="ev-card-header" style={{ '--ev-color': color }}>
-        <div className="ev-cat-chip" style={{ color, borderColor: color + '44', background: color + '18' }}>
-          {emoji} {event.category}
+    <div className="ev2-featured" style={{ background: bg }}>
+      <div className="ev2-featured-overlay">
+        <div className="ev2-featured-top">
+          <span className="ev2-cat-chip" style={{ color: cat.color, background: cat.color + '22' }}>
+            {cat.emoji} {event.category}
+          </span>
+          <span className="ev2-featured-star">✨ À la une</span>
         </div>
-        <div className="ev-time">{event.time_start}–{event.time_end}</div>
-      </div>
-      <div className="ev-card-body">
-        <div className="ev-title">{event.title}</div>
-        <div className="ev-spot-row">
-          <span className="ev-spot-name">📍 {event.spot_name}</span>
-          <span className="ev-quartier">{event.quartier}</span>
-        </div>
-        <p className="ev-desc">{event.description}</p>
-        <div className="ev-tags">
-          {event.tags.slice(0, 3).map((t) => (
-            <span key={t} className="ev-tag">#{t}</span>
-          ))}
-        </div>
-      </div>
-      <div className="ev-card-footer">
-        <div className="ev-price">
-          <span className="ev-price-badge">{event.price}</span>
-          {event.price_detail && <span className="ev-price-detail">{event.price_detail}</span>}
+        <div className="ev2-featured-body">
+          <div className="ev2-featured-title">{event.title}</div>
+          <div className="ev2-featured-meta">
+            <span>📍 {event.spot_name}</span>
+            {event.quartier && <span className="ev2-dot">·</span>}
+            {event.quartier && <span>{event.quartier}</span>}
+            <span className="ev2-dot">·</span>
+            <span style={{ color: cat.color, fontWeight: 600 }}>{event.time_start}</span>
+          </div>
+          {event.price_detail && (
+            <span className="ev2-price-pill">{event.price_detail}</span>
+          )}
         </div>
         {event.link && (
-          <a className="ev-cta" href={event.link} target="_blank" rel="noreferrer">
+          <a className="ev2-featured-cta" href={event.link} target="_blank" rel="noreferrer"
+            onClick={e => e.stopPropagation()}>
             Réserver →
           </a>
         )}
@@ -70,64 +57,116 @@ function EventCard({ event }) {
   );
 }
 
-function groupByDate(events) {
-  const groups = {};
-  events.forEach((e) => {
-    if (!groups[e.date]) groups[e.date] = [];
-    groups[e.date].push(e);
-  });
-  return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+function EventCard({ event }) {
+  const cat = getCat(event.category);
+  return (
+    <div className="ev2-card">
+      <div className="ev2-card-thumb" style={{
+        background: event.photo_url ? `url(${event.photo_url}) center/cover` : cat.color + '22'
+      }}>
+        {!event.photo_url && <span className="ev2-card-thumb-emoji">{cat.emoji}</span>}
+      </div>
+      <div className="ev2-card-body">
+        <div className="ev2-card-top">
+          <span className="ev2-cat-chip small" style={{ color: cat.color, background: cat.color + '18' }}>
+            {cat.emoji} {event.category}
+          </span>
+          <span className="ev2-card-time">{event.time_start}</span>
+        </div>
+        <div className="ev2-card-title">{event.title}</div>
+        <div className="ev2-card-spot">📍 {event.spot_name}{event.quartier ? ` · ${event.quartier}` : ''}</div>
+        {event.price_detail && <div className="ev2-card-price">{event.price_detail}</div>}
+      </div>
+      {event.link && (
+        <a className="ev2-card-link" href={event.link} target="_blank" rel="noreferrer"
+          onClick={e => e.stopPropagation()}>›</a>
+      )}
+    </div>
+  );
 }
 
-const FILTERS = [
-  { key: 'all',     label: '🗓️ Tous' },
-  { key: 'tonight', label: '🌙 Ce soir' },
-  { key: 'weekend', label: '🎉 Weekend' },
-  { key: 'week',    label: '📅 Cette semaine' },
-];
-
 export default function EventsView({ onClose }) {
-  const { events, filter, setFilter } = useEvents();
-  const groups = groupByDate(events);
+  const {
+    events, weekDays, activeDay, setActiveDay,
+    activeCategory, setActiveCategory, categories, hasDayEvents,
+  } = useEvents();
 
-  return (
-    <div className="evview-overlay" onClick={onClose}>
-      <div className="evview-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="evview-handle" />
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-        <div className="evview-header">
-          <div className="evview-title">🎫 Événements</div>
-          <div className="evview-sub">Toulouse · agenda des sorties</div>
-          <button className="evview-close" onClick={onClose}>×</button>
+  const featured = events.find(e => e.featured);
+  const others   = events.filter(e => !e.featured || e !== featured);
+
+  return createPortal(
+    <div className="ev2-overlay" onClick={onClose}>
+      <div className="ev2-panel" onClick={e => e.stopPropagation()}>
+        <div className="ev2-handle" />
+
+        {/* Header */}
+        <div className="ev2-header">
+          <div className="ev2-header-left">
+            <div className="ev2-title">Agenda Toulouse</div>
+            <div className="ev2-sub">Sélectionne un jour</div>
+          </div>
+          <button className="ev2-close" onClick={onClose}>×</button>
         </div>
 
-        <div className="evview-filters">
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              className={`evview-filter-chip${filter === f.key ? ' active' : ''}`}
-              onClick={() => setFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
+        {/* Week strip */}
+        <div className="ev2-week">
+          {weekDays.map(day => {
+            const iso = day.toISOString().slice(0, 10);
+            const isToday = day.toDateString() === today.toDateString();
+            const isActive = iso === activeDay;
+            const hasEvents = hasDayEvents[iso];
+            return (
+              <button
+                key={iso}
+                className={`ev2-day-btn${isActive ? ' active' : ''}${isToday ? ' today' : ''}`}
+                onClick={() => setActiveDay(iso)}
+              >
+                <span className="ev2-day-label">{DAY_LABELS[day.getDay()]}</span>
+                <span className="ev2-day-num">{day.getDate()}</span>
+                {hasEvents && <span className="ev2-day-dot" />}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="evview-body">
-          {groups.length === 0 && (
-            <div className="evview-empty">
-              <div className="evview-empty-icon">📭</div>
-              <div className="evview-empty-text">Pas d'événements pour ce filtre</div>
+        {/* Category filters */}
+        <div className="ev2-cats">
+          {categories.map(cat => {
+            const cfg = getCat(cat);
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                className={`ev2-cat-btn${isActive ? ' active' : ''}`}
+                style={isActive ? { background: cfg.color, color: '#fff', borderColor: cfg.color } : {}}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cfg.emoji} {cfg.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Body */}
+        <div className="ev2-body">
+          {events.length === 0 ? (
+            <div className="ev2-empty">
+              <div className="ev2-empty-icon">📭</div>
+              <div className="ev2-empty-text">Pas d'événements ce jour</div>
+              <div className="ev2-empty-sub">Essaie un autre jour ou une autre catégorie</div>
             </div>
+          ) : (
+            <>
+              {featured && <FeaturedCard event={featured} />}
+              {others.map(e => <EventCard key={e.id} event={e} />)}
+            </>
           )}
-          {groups.map(([date, dayEvents]) => (
-            <div key={date} className="ev-day-group">
-              <div className="ev-day-label">{formatDate(date)}</div>
-              {dayEvents.map((e) => <EventCard key={e.id} event={e} />)}
-            </div>
-          ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

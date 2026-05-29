@@ -2,8 +2,57 @@ import { useMemo, useState } from 'react';
 import { MOODS, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
+import { useEvents } from '../../hooks/useEvents';
 import SpotDetail from '../MapView/SpotDetail';
 import './HomeView.css';
+
+const EV_CAT_COLOR = {
+  'DJ Set': '#A78BFA', 'Concert': '#FB7185', 'Happy Hour': '#06B6D4',
+  'Soirée': '#EC4899', 'Brunch': '#4ade80', 'Expo': '#FBBF24',
+};
+const EV_CAT_EMOJI = {
+  'DJ Set': '🎛️', 'Concert': '🎤', 'Happy Hour': '🍹',
+  'Soirée': '🎉', 'Brunch': '☕', 'Expo': '🎭',
+};
+
+function FeaturedEventCard({ event, onOpen }) {
+  const color = EV_CAT_COLOR[event.category] || '#A78BFA';
+  const emoji = EV_CAT_EMOJI[event.category] || '📅';
+  const bg = event.photo_url
+    ? `url(${event.photo_url}) center/cover no-repeat`
+    : 'linear-gradient(160deg,#1a1035,#2d1052,#3b0764)';
+  return (
+    <button className="hv-ev-featured" style={{ background: bg }} onClick={onOpen}>
+      <div className="hv-ev-featured-overlay">
+        <div className="hv-ev-featured-top">
+          <span className="hv-ev-chip" style={{ color, background: color + '22' }}>{emoji} {event.category}</span>
+          {event.featured && <span className="hv-ev-star">✨ À la une</span>}
+        </div>
+        <div className="hv-ev-featured-title">{event.title}</div>
+        <div className="hv-ev-featured-meta">
+          📍 {event.spot_name}
+          {event.quartier ? ` · ${event.quartier}` : ''}
+          <span style={{ color, fontWeight: 600 }}> · {event.time_start}</span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function EventRow({ event, onOpen }) {
+  const color = EV_CAT_COLOR[event.category] || '#A78BFA';
+  const emoji = EV_CAT_EMOJI[event.category] || '📅';
+  return (
+    <button className="hv-ev-row" onClick={onOpen}>
+      <div className="hv-ev-row-icon" style={{ background: color + '20' }}>{emoji}</div>
+      <div className="hv-ev-row-body">
+        <div className="hv-ev-row-title">{event.title}</div>
+        <div className="hv-ev-row-meta">📍 {event.spot_name} · <span style={{ color }}>{event.time_start}</span></div>
+      </div>
+      <span className="hv-ev-row-chevron">›</span>
+    </button>
+  );
+}
 
 
 function greeting() {
@@ -65,10 +114,11 @@ function EventPill({ event, onClick }) {
   );
 }
 
-export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, onGoMap, events }) {
+export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, onGoMap, onOpenEvents }) {
   const [activeMood, setActiveMood] = useState(null);
   const [selected,   setSelected]   = useState(null);
   const { text, sub } = greeting();
+  const { allEvents } = useEvents();
 
   const openSpots = useMemo(() =>
     spots.filter(s => {
@@ -89,10 +139,13 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
   [spots]);
 
   const tonightEvents = useMemo(() => {
-    if (!events?.length) return [];
+    if (!allEvents?.length) return [];
     const today = new Date().toISOString().slice(0, 10);
-    return events.filter(e => e.date === today).slice(0, 6);
-  }, [events]);
+    return allEvents.filter(e => e.date === today).slice(0, 4);
+  }, [allEvents]);
+
+  const featuredEvent = tonightEvents.find(e => e.featured) || tonightEvents[0] || null;
+  const otherEvents   = tonightEvents.filter(e => e !== featuredEvent).slice(0, 2);
 
   const displaySpots = activeMood ? moodSpots : openSpots;
   const sectionTitle = activeMood
@@ -131,6 +184,22 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
         </div>
       </div>
 
+      {/* ── Événements ce soir ── */}
+      {featuredEvent && (
+        <div className="hv-section">
+          <div className="hv-section-header">
+            <span className="hv-section-title">🎫 Ce soir à Toulouse</span>
+            <button className="hv-section-link" onClick={onOpenEvents}>Agenda complet</button>
+          </div>
+          <FeaturedEventCard event={featuredEvent} onOpen={onOpenEvents} />
+          {otherEvents.length > 0 && (
+            <div className="hv-ev-rows">
+              {otherEvents.map(e => <EventRow key={e.id} event={e} onOpen={onOpenEvents} />)}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Spots ouverts / mood ── */}
       <div className="hv-section">
         <div className="hv-section-header">
@@ -147,21 +216,6 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
           <div className="hv-empty">Aucun spot ouvert pour cette ambiance</div>
         )}
       </div>
-
-      {/* ── Événements ce soir ── */}
-      {tonightEvents.length > 0 && (
-        <div className="hv-section hv-section-events">
-          <div className="hv-section-header">
-            <span className="hv-section-title">🎫 Ce soir à Toulouse</span>
-            <button className="hv-section-link" onClick={onGoMap}>Agenda complet</button>
-          </div>
-          <div className="hv-scroll-row">
-            {tonightEvents.map(e => (
-              <EventPill key={e.id} event={e} onClick={() => {}} />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── Coups de coeur ── */}
       {topSpots.length > 0 && (

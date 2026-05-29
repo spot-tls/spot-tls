@@ -209,18 +209,30 @@ export default function ProfileView({
           </div>
         </div>
 
-        {/* Footer — secret tap x5 pour mode admin */}
+        {/* Admin access */}
+        <div className="pv-section">
+          <div className="pv-section-header">
+            <span className="pv-section-icon">🔑</span>
+            <div>
+              <div className="pv-section-title">Administration</div>
+              <div className="pv-section-sub">{admin ? 'Mode admin actif' : 'Accès équipe SpotTLS'}</div>
+            </div>
+          </div>
+          <button className="pv-row" onClick={onSecretTap}>
+            <div className="pv-row-left">
+              <span className="pv-row-icon">{admin ? '🟢' : '🔒'}</span>
+              <div>
+                <div className="pv-row-label">{admin ? 'Admin activé — retaper pour désactiver' : 'Activer le mode admin'}</div>
+                <div className="pv-row-sub">Tap × 5 pour basculer</div>
+              </div>
+            </div>
+            <span className="pv-row-chevron">›</span>
+          </button>
+        </div>
+
         <div className="pv-footer">
-          <div
-            className="pv-footer-logo"
-            onClick={onSecretTap}
-            style={{ cursor: 'default', userSelect: 'none' }}
-          >
-            Spot<span>FR</span>
-          </div>
-          <div className="pv-footer-version">
-            Beta v0.8 · Toulouse{admin ? ' · 🔑 Admin' : ''}
-          </div>
+          <div className="pv-footer-logo">Spot<span>TLS</span></div>
+          <div className="pv-footer-version">Beta v0.9 · Toulouse</div>
         </div>
 
       </div>

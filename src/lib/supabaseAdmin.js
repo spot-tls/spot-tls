@@ -14,3 +14,18 @@ export async function updateSpotCoords(id, lat, lng) {
   const { error } = await supabaseAdmin.from('spots').update({ lat, lng }).eq('id', id);
   if (error) throw error;
 }
+
+export async function createEvent(eventData) {
+  const { error } = await supabaseAdmin.from('events').insert([eventData]);
+  if (error) throw error;
+}
+
+export async function updateEvent(id, eventData) {
+  const { error } = await supabaseAdmin.from('events').update(eventData).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteEvent(id) {
+  const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
+  if (error) throw error;
+}

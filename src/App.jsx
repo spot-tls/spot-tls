@@ -153,7 +153,7 @@ export default function App() {
 
       <BottomNav activePage={activePage} onChange={setActivePage} favCount={count} />
       {showBeta   && <BetaModal onClose={() => setShowBeta(false)} />}
-      {showEvents && <EventsView onClose={() => setShowEvents(false)} />}
+      {showEvents && <EventsView onClose={() => setShowEvents(false)} admin={admin} />}
       {showSplash && (
         <SplashScreen onDismiss={dismissSplash} onJoinBeta={() => setShowBeta(true)} />
       )}

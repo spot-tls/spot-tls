@@ -1,5 +1,7 @@
 import { createPortal } from 'react-dom';
+import { useState } from 'react';
 import { useEvents } from '../../hooks/useEvents';
+import AdminEventForm from '../AdminEventForm/AdminEventForm';
 import './EventsView.css';
 
 const DAY_LABELS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
@@ -85,11 +87,14 @@ function EventCard({ event }) {
   );
 }
 
-export default function EventsView({ onClose }) {
+export default function EventsView({ onClose, admin }) {
   const {
-    events, weekDays, activeDay, setActiveDay,
+    events, allEvents, weekDays, activeDay, setActiveDay,
     activeCategory, setActiveCategory, categories, hasDayEvents,
   } = useEvents();
+
+  const [editingEvent, setEditingEvent] = useState(null); // null = fermé, {} = nouveau, event = édition
+  const [refreshKey,   setRefreshKey]   = useState(0);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -108,7 +113,12 @@ export default function EventsView({ onClose }) {
             <div className="ev2-title">Agenda Toulouse</div>
             <div className="ev2-sub">Sélectionne un jour</div>
           </div>
-          <button className="ev2-close" onClick={onClose}>×</button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {admin && (
+              <button className="ev2-admin-add" onClick={() => setEditingEvent({})}>➕</button>
+            )}
+            <button className="ev2-close" onClick={onClose}>×</button>
+          </div>
         </div>
 
         {/* Week strip */}
@@ -160,12 +170,35 @@ export default function EventsView({ onClose }) {
             </div>
           ) : (
             <>
-              {featured && <FeaturedCard event={featured} />}
-              {others.map(e => <EventCard key={e.id} event={e} />)}
+              {featured && (
+                <div style={{ position: 'relative' }}>
+                  <FeaturedCard event={featured} />
+                  {admin && (
+                    <button className="ev2-edit-btn" onClick={() => setEditingEvent(featured)}>✏️</button>
+                  )}
+                </div>
+              )}
+              {others.map(e => (
+                <div key={e.id} style={{ position: 'relative' }}>
+                  <EventCard event={e} />
+                  {admin && (
+                    <button className="ev2-edit-btn" onClick={() => setEditingEvent(e)}>✏️</button>
+                  )}
+                </div>
+              ))}
             </>
           )}
         </div>
       </div>
+
+      {editingEvent !== null && (
+        <AdminEventForm
+          event={Object.keys(editingEvent).length ? editingEvent : null}
+          onClose={() => setEditingEvent(null)}
+          onSaved={() => { setEditingEvent(null); setRefreshKey(k => k + 1); window.location.reload(); }}
+          onDeleted={() => { setEditingEvent(null); window.location.reload(); }}
+        />
+      )}
     </div>,
     document.body
   );

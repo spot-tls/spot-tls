@@ -4,6 +4,7 @@ import { deleteSpot, updateSpotCoords } from '../../lib/supabaseAdmin';
 import { getCatConfig, MOODS, matchMood } from '../../utils/config';
 import { isOpenNow, getNextOpening } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
+import { useReactions, REACTION_EMOJIS } from '../../hooks/useReactions';
 
 const WEEK = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 const TODAY = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'][new Date().getDay()];
@@ -77,6 +78,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
   const [shared,    setShared]    = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
+  const { react, getReactions, getUserVote } = useReactions();
 
   const handleDelete = async () => {
     if (!confirmDel) { setConfirmDel(true); return; }
@@ -239,6 +241,23 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
             {confirmDel && <button className="sd-admin-btn" onClick={() => setConfirmDel(false)}>Annuler</button>}
           </div>
         )}
+
+        <div className="sd-reactions">
+          {REACTION_EMOJIS.map((emoji) => {
+            const count    = (getReactions(spot.id)[emoji] || 0);
+            const selected = getUserVote(spot.id) === emoji;
+            return (
+              <button
+                key={emoji}
+                className={`sd-reaction-btn${selected ? ' active' : ''}`}
+                onClick={() => react(spot.id, emoji)}
+              >
+                <span className="sd-reaction-emoji">{emoji}</span>
+                {count > 0 && <span className="sd-reaction-count">{count}</span>}
+              </button>
+            );
+          })}
+        </div>
 
         <div className="sd-body">
           {spot.description && <p className="sd-desc">{spot.description}</p>}

@@ -45,4 +45,46 @@ export function useEvents() {
         if (data && data.length > 0) {
           setAllEvents(data);
         } else {
-          throw new Error('Supabas
+          throw new Error('Supabase events vide');
+        }
+      } catch (e) {
+        console.warn('[useEvents] fallback local:', e.message);
+        const valid = eventsData.filter(e => parseDate(e.date) >= TODAY);
+        valid.sort((a, b) => parseDate(a.date) - parseDate(b.date));
+        setAllEvents(valid);
+      }
+    }
+    load();
+  }, []);
+
+  const filtered = useMemo(() => {
+    return allEvents.filter(e => {
+      const matchDay = e.date === activeDay;
+      const matchCat = activeCategory === 'all' || e.category === activeCategory;
+      return matchDay && matchCat;
+    });
+  }, [allEvents, activeDay, activeCategory]);
+
+  const categories = useMemo(() => {
+    const cats = new Set(allEvents.map(e => e.category).filter(Boolean));
+    return ['all', ...cats];
+  }, [allEvents]);
+
+  const hasDayEvents = useMemo(() => {
+    const map = {};
+    allEvents.forEach(e => { map[e.date] = true; });
+    return map;
+  }, [allEvents]);
+
+  return {
+    events: filtered,
+    allEvents,
+    weekDays,
+    activeDay,
+    setActiveDay,
+    activeCategory,
+    setActiveCategory,
+    categories,
+    hasDayEvents,
+  };
+}

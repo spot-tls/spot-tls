@@ -200,4 +200,11 @@ export default function SpotEditor({ spot, onClose, onSave }) {
         {/* Footer CTA */}
         <div className="spe-footer">
           <button className="spe-btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="spe-btn-save" onClick={handleSave}>💾 Sauvegarder</b
+          <button className="spe-btn-save" onClick={handleSave}>💾 Sauvegarder</button>
+        </div>
+
+      </div>
+    </div>,
+    document.body
+  );
+}

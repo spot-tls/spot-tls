@@ -98,3 +98,21 @@
   font-size: 12px !important;
   padding: 8px 12px !important;
 }
+
+.topbar-agenda-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #EC4899, #A78BFA);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s ease, transform .1s ease;
+  flex-shrink: 0;
+}
+.topbar-agenda-btn:hover  { opacity: 0.88; }
+.topbar-agenda-btn:active { transform: scale(0.96); }

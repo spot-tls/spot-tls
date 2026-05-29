@@ -177,4 +177,73 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
               className={`hv-mood-chip${activeMood === m.key ? ' active' : ''}`}
               onClick={() => setActiveMood(v => v === m.key ? null : m.key)}
             >
-              <span classN
+              <span className="hv-mood-emoji">{m.emoji}</span>
+              <span className="hv-mood-label">{m.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Événements ce soir ── */}
+      {featuredEvent && (
+        <div className="hv-section">
+          <div className="hv-section-header">
+            <span className="hv-section-title">🎫 Ce soir à Toulouse</span>
+            <button className="hv-section-link" onClick={onOpenEvents}>Agenda complet</button>
+          </div>
+          <FeaturedEventCard event={featuredEvent} onOpen={onOpenEvents} />
+          {otherEvents.length > 0 && (
+            <div className="hv-ev-rows">
+              {otherEvents.map(e => <EventRow key={e.id} event={e} onOpen={onOpenEvents} />)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Spots ouverts / mood ── */}
+      <div className="hv-section">
+        <div className="hv-section-header">
+          <span className="hv-section-title">{sectionTitle}</span>
+          <button className="hv-section-link" onClick={onGoMap}>Tout voir</button>
+        </div>
+        {displaySpots.length > 0 ? (
+          <div className="hv-scroll-row">
+            {displaySpots.map(s => (
+              <SpotCard key={s.id} spot={s} onClick={() => setSelected(s)} userPos={userPos} />
+            ))}
+          </div>
+        ) : (
+          <div className="hv-empty">Aucun spot ouvert pour cette ambiance</div>
+        )}
+      </div>
+
+      {/* ── Coups de coeur ── */}
+      {topSpots.length > 0 && (
+        <div className="hv-section">
+          <div className="hv-section-header">
+            <span className="hv-section-title">❤️ Coups de cœur</span>
+            <button className="hv-section-link" onClick={onGoMap}>Voir sur carte</button>
+          </div>
+          <div className="hv-scroll-row">
+            {topSpots.map(s => (
+              <SpotCard key={s.id} spot={s} onClick={() => setSelected(s)} userPos={userPos} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="hv-footer-pad" />
+
+      {selected && (
+        <SpotDetail
+          spot={selected}
+          onClose={() => setSelected(null)}
+          isFavorite={isFavorite}
+          onToggleFavorite={onToggleFavorite}
+          userPos={userPos}
+        />
+      )}
+    </div>
+  );
+}
+

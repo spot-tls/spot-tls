@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { updateSpot } from '../../lib/supabaseAdmin';
 import './SpotEditor.css';
 
 const DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
@@ -24,7 +25,7 @@ function Field({ label, children }) {
   );
 }
 
-export default function SpotEditor({ spot, onClose, onSave }) {
+export default function SpotEditor({ spot, onClose, onSave, admin }) {
   const [form, setForm] = useState({
     name:            spot.name || '',
     category:        spot.category || '',
@@ -36,7 +37,9 @@ export default function SpotEditor({ spot, onClose, onSave }) {
     price:           spot.price || '€€',
     vibe_tags:       (spot.vibe_tags || []).join(', '),
     hours:           spot.hours ? JSON.parse(JSON.stringify(spot.hours)) : Object.fromEntries(DAYS.map(d => [d, null])),
+    photo_url:       spot.photo_url || '',
   });
+  const [saving, setSaving] = useState(false);
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
@@ -55,14 +58,13 @@ export default function SpotEditor({ spot, onClose, onSave }) {
     });
   };
 
-  const handleSave = () => {
-    // Parse vibe_tags from comma-separated string
+  const handleSave = async () => {
     const vibe_tags = form.vibe_tags
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean);
 
-    onSave({
+    const fields = {
       name:            form.name.trim(),
       category:        form.category,
       description:     form.description.trim(),
@@ -73,7 +75,14 @@ export default function SpotEditor({ spot, onClose, onSave }) {
       price:           form.price,
       vibe_tags,
       hours:           form.hours,
-    });
+      photo_url:       form.photo_url.trim(),
+    };
+
+    setSaving(true);
+    if (admin && spot.id) {
+      try { await updateSpot(spot.id, fields); } catch (e) { console.error('updateSpot error:', e); }
+    }
+    onSave(fields);
     onClose();
   };
 
@@ -138,6 +147,23 @@ export default function SpotEditor({ spot, onClose, onSave }) {
                 placeholder="cosy, terrasse, dansant…"
               />
             </Field>
+
+            <Field label="🖼️ Photo URL">
+              <input
+                className="spe-input"
+                value={form.photo_url}
+                onChange={(e) => set('photo_url', e.target.value)}
+                placeholder="https://images.unsplash.com/…"
+              />
+              {form.photo_url && (
+                <img
+                  src={form.photo_url}
+                  alt="preview"
+                  style={{ marginTop: 8, width: '100%', height: 120, objectFit: 'cover', borderRadius: 10 }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              )}
+            </Field>
           </div>
 
           {/* Contacts */}
@@ -200,7 +226,9 @@ export default function SpotEditor({ spot, onClose, onSave }) {
         {/* Footer CTA */}
         <div className="spe-footer">
           <button className="spe-btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="spe-btn-save" onClick={handleSave}>💾 Sauvegarder</button>
+          <button className="spe-btn-save" onClick={handleSave} disabled={saving}>
+            {saving ? 'Enregistrement…' : '💾 Sauvegarder'}
+          </button>
         </div>
 
       </div>

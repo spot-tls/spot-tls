@@ -401,6 +401,7 @@ export default function MapView({
         <SpotEditor
           spot={editingSpot}
           onClose={() => setEditingSpot(null)}
+          admin={admin}
           onSave={(fields) => {
             onEditSpot?.(editingSpot.id, fields);
             setEditingSpot(null);

@@ -15,6 +15,11 @@ export async function updateSpotCoords(id, lat, lng) {
   if (error) throw error;
 }
 
+export async function updateSpot(id, data) {
+  const { error } = await supabaseAdmin.from('spots').update(data).eq('id', id);
+  if (error) throw error;
+}
+
 export async function createEvent(eventData) {
   const { error } = await supabaseAdmin.from('events').insert([eventData]);
   if (error) throw error;

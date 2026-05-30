@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { MOODS, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
@@ -15,12 +15,79 @@ const EV_CAT_EMOJI = {
   'Soirée': '🎉', 'Brunch': '☕', 'Expo': '🎭',
 };
 
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 6)  return { text: 'Bonne nuit 🌙', sub: "Les spots les plus tardifs t'attendent" };
+  if (h < 12) return { text: 'Bonjour ☀️',   sub: 'Brunch, café, que du bon à Toulouse' };
+  if (h < 18) return { text: 'Bonne journée 🌤️', sub: 'Prépare ta soirée dès maintenant' };
+  return { text: 'Ce soir à Toulouse 🔥', sub: 'Trouve le spot parfait pour ta nuit' };
+}
+
+/* ── SpotCard — grande, photo-forward ── */
+function SpotCard({ spot, onClick, userPos }) {
+  const cat   = getCatConfig(spot.category);
+  const hasH  = !!spot.hours && Object.keys(spot.hours).length > 0;
+  const open  = hasH ? isOpenNow(spot) : null;
+  const dist  = userPos ? distanceKm(userPos, { lat: spot.lat, lng: spot.lng }) : null;
+  const photo = spot.photos?.[0] || spot.photo_url || null;
+  const qColor = QUARTIER_COLORS[spot.quartier] || cat.color;
+  const rating = spot.google_rating;
+
+  return (
+    <button className="hv-spot-card" onClick={onClick}>
+      {/* Photo / gradient */}
+      <div className="hv-spot-photo" style={{ background: photo ? undefined : cat.gradient }}>
+        {photo
+          ? <img src={photo} alt={spot.name} onError={e => e.target.style.display='none'} />
+          : <span className="hv-spot-photo-emoji">{cat.emoji}</span>}
+
+        {/* Badges overlay */}
+        <div className="hv-spot-photo-overlay">
+          {open === true && (
+            <span className="hv-badge hv-badge-open">● Ouvert</span>
+          )}
+          {open === false && (
+            <span className="hv-badge hv-badge-closed">Fermé</span>
+          )}
+        </div>
+
+        {/* Gradient fade bottom */}
+        <div className="hv-spot-photo-fade" />
+      </div>
+
+      {/* Info */}
+      <div className="hv-spot-info">
+        <div className="hv-spot-name">{spot.name}</div>
+        <div className="hv-spot-meta-row">
+          <span className="hv-spot-cat-chip" style={{ color: cat.color, background: cat.color + '18' }}>
+            {cat.emoji} {spot.category}
+          </span>
+          {rating && (
+            <span className="hv-spot-rating">⭐ {rating.toFixed(1)}</span>
+          )}
+        </div>
+        <div className="hv-spot-footer-row">
+          {spot.quartier && (
+            <span className="hv-spot-q" style={{ background: qColor + '22', color: qColor }}>
+              {spot.quartier}
+            </span>
+          )}
+          {dist != null && (
+            <span className="hv-spot-dist">📍 {formatDistance(dist)}</span>
+          )}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+/* ── Featured Event Card ── */
 function FeaturedEventCard({ event, onOpen }) {
   const color = EV_CAT_COLOR[event.category] || '#A78BFA';
   const emoji = EV_CAT_EMOJI[event.category] || '📅';
   const bg = event.photo_url
     ? `url(${event.photo_url}) center/cover no-repeat`
-    : 'linear-gradient(160deg,#1a1035,#2d1052,#3b0764)';
+    : `linear-gradient(160deg,#1a1035,#2d1052,#3b0764)`;
   return (
     <button className="hv-ev-featured" style={{ background: bg }} onClick={onOpen}>
       <div className="hv-ev-featured-overlay">
@@ -54,72 +121,30 @@ function EventRow({ event, onOpen }) {
   );
 }
 
-
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 6)  return { text: 'Bonne nuit 🌙', sub: "Les spots les plus tardifs t'attendent" };
-  if (h < 12) return { text: 'Bonjour ☀️',   sub: 'Brunch, café, que du bon à Toulouse' };
-  if (h < 18) return { text: 'Bonne journée 🌤️', sub: 'Prépare ta soirée dès maintenant' };
-  return { text: 'Ce soir à Toulouse 🔥', sub: 'Trouve le spot parfait pour ta nuit' };
-}
-
-function SpotCard({ spot, onClick, userPos }) {
-  const cat   = getCatConfig(spot.category);
-  const hasH  = !!spot.hours && Object.keys(spot.hours).length > 0;
-  const open  = hasH ? isOpenNow(spot) : null;
-  const dist  = userPos ? distanceKm(userPos, { lat: spot.lat, lng: spot.lng }) : null;
-  const photo = spot.photos?.[0] || spot.photo_url || null;
-  const qColor = QUARTIER_COLORS[spot.quartier] || cat.color;
-
+/* ── MoodChip ── */
+function MoodChip({ mood, active, count, onClick }) {
   return (
-    <button className="hv-spot-card" onClick={onClick}>
-      <div className="hv-spot-thumb" style={{ background: photo ? undefined : cat.gradient }}>
-        {photo
-          ? <img src={photo} alt={spot.name} onError={e => e.target.style.display='none'} />
-          : <span>{cat.emoji}</span>}
-        {open === true && <div className="hv-spot-open-dot" />}
-        {spot.google_rating >= 4.5 && <div className="hv-spot-coup">❤️</div>}
-      </div>
-      <div className="hv-spot-info">
-        <div className="hv-spot-name">{spot.name}</div>
-        <div className="hv-spot-meta">
-          <span className="hv-spot-cat" style={{ color: cat.color }}>{cat.emoji} {spot.category}</span>
-        </div>
-        <div className="hv-spot-footer">
-          <span className="hv-spot-q" style={{ background: qColor + '22', color: qColor }}>
-            {spot.quartier}
-          </span>
-          {dist != null && <span className="hv-spot-dist">📍 {formatDistance(dist)}</span>}
-        </div>
-      </div>
+    <button
+      className={`hv-mood-chip${active ? ' active' : ''}`}
+      onClick={onClick}
+      style={active ? { '--mood-color': mood.color || '#A78BFA' } : {}}
+    >
+      <span className="hv-mood-emoji">{mood.emoji}</span>
+      <span className="hv-mood-label">{mood.label}</span>
+      {count > 0 && <span className="hv-mood-count">{count}</span>}
     </button>
   );
 }
 
-function EventPill({ event, onClick }) {
-  const EMOJI = { 'DJ Set': '🎛️', Concert: '🎤', 'Happy Hour': '🍹', Soirée: '🎉', Expo: '🎭', Brunch: '☕' };
-  const COLORS = { 'DJ Set': '#A78BFA', Concert: '#FB7185', 'Happy Hour': '#06B6D4', Soirée: '#EC4899', Expo: '#FBBF24', Brunch: '#4ade80' };
-  const color = COLORS[event.category] || '#A78BFA';
-  const emoji = EMOJI[event.category] || '📅';
-  return (
-    <button className="hv-event-pill" onClick={onClick} style={{ '--ev-color': color }}>
-      <div className="hv-event-pill-cat" style={{ color, background: color + '20' }}>{emoji} {event.category}</div>
-      <div className="hv-event-pill-title">{event.title}</div>
-      <div className="hv-event-pill-meta">
-        <span>📍 {event.spot_name}</span>
-        <span className="hv-event-pill-time">{event.time_start}</span>
-      </div>
-      {event.featured && <div className="hv-event-pill-star">✨</div>}
-    </button>
-  );
-}
-
+/* ══════════════════════════════════════════════ */
 export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onGoMap, onOpenEvents, admin, onAdminReposition, onAdminDelete }) {
-  const [activeMood, setActiveMood] = useState(null);
-  const [selected,   setSelected]   = useState(null);
+  const [activeMood,    setActiveMood]    = useState(null);
+  const [selected,      setSelected]      = useState(null);
+  const [surpriseAnim,  setSurpriseAnim]  = useState(false);
   const { text, sub } = greeting();
   const { allEvents } = useEvents();
 
+  /* ── Spots calculés ── */
   const openSpots = useMemo(() =>
     spots.filter(s => {
       const hasH = !!s.hours && Object.keys(s.hours).length > 0;
@@ -129,7 +154,7 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
 
   const moodSpots = useMemo(() => {
     if (!activeMood) return [];
-    return spots.filter(s => matchMood(s, activeMood)).slice(0, 10);
+    return spots.filter(s => matchMood(s, activeMood)).slice(0, 12);
   }, [spots, activeMood]);
 
   const topSpots = useMemo(() =>
@@ -137,15 +162,6 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       .sort((a, b) => (b.google_rating || 0) - (a.google_rating || 0))
       .slice(0, 10),
   [spots]);
-
-  const tonightEvents = useMemo(() => {
-    if (!allEvents?.length) return [];
-    const today = new Date().toISOString().slice(0, 10);
-    return allEvents.filter(e => e.date === today).slice(0, 4);
-  }, [allEvents]);
-
-  const featuredEvent = tonightEvents.find(e => e.featured) || tonightEvents[0] || null;
-  const otherEvents   = tonightEvents.filter(e => e !== featuredEvent).slice(0, 2);
 
   const nearbySpots = useMemo(() => {
     if (!userPos) return [];
@@ -156,28 +172,115 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       .slice(0, 8);
   }, [spots, userPos]);
 
-  const displaySpots = activeMood ? moodSpots : openSpots;
-  const sectionTitle = activeMood
-    ? `Spots ${MOODS.find(m => m.key === activeMood)?.label || ''}`
-    : openSpots.length > 0 ? `${openSpots.length} spots ouverts maintenant` : 'Spots tendance ce soir';
+  /* Count par mood */
+  const moodCounts = useMemo(() => {
+    const counts = {};
+    MOODS.forEach(m => {
+      counts[m.key] = spots.filter(s => matchMood(s, m.key)).length;
+    });
+    return counts;
+  }, [spots]);
+
+  const tonightEvents = useMemo(() => {
+    if (!allEvents?.length) return [];
+    const today = new Date().toISOString().slice(0, 10);
+    return allEvents.filter(e => e.date === today).slice(0, 4);
+  }, [allEvents]);
+
+  const featuredEvent = tonightEvents.find(e => e.featured) || tonightEvents[0] || null;
+  const otherEvents   = tonightEvents.filter(e => e !== featuredEvent).slice(0, 2);
+
+  const displaySpots  = activeMood ? moodSpots : openSpots;
+  const sectionLabel  = activeMood
+    ? `${MOODS.find(m => m.key === activeMood)?.label || ''}`
+    : openSpots.length > 0
+      ? `${openSpots.length} spots ouverts`
+      : 'Spots du moment';
+
+  /* ── Surprise me ── */
+  const handleSurprise = useCallback(() => {
+    const pool = openSpots.length > 0 ? openSpots : topSpots;
+    if (!pool.length) return;
+    setSurpriseAnim(true);
+    setTimeout(() => setSurpriseAnim(false), 600);
+    const rand = pool[Math.floor(Math.random() * pool.length)];
+    setSelected(rand);
+  }, [openSpots, topSpots]);
 
   return (
     <div className="homeview">
-      {/* ── Hero greeting ── */}
+
+      {/* ══ HERO ══ */}
       <div className="hv-hero">
         <div className="hv-hero-glow" />
         <div className="hv-hero-glow2" />
+        <div className="hv-hero-label">Toulouse · Vie nocturne</div>
         <div className="hv-greeting">{text}</div>
         <div className="hv-greeting-sub">{sub}</div>
-        <button className="hv-cta-map" onClick={onGoMap}>
-          🗺️ Explorer les spots
-        </button>
+        <div className="hv-hero-actions">
+          <button className="hv-cta-map" onClick={onGoMap}>
+            🗺️ Explorer
+          </button>
+          <button
+            className={`hv-cta-surprise${surpriseAnim ? ' anim' : ''}`}
+            onClick={handleSurprise}
+          >
+            🎲 Surprise
+          </button>
+        </div>
       </div>
 
-      {/* ── Autour de moi ── */}
+      {/* ══ MOOD PICKER — interaction principale ══ */}
+      <div className="hv-section hv-section-mood">
+        <div className="hv-section-header">
+          <span className="hv-section-title">Ton ambiance du soir</span>
+          {activeMood && (
+            <button className="hv-section-link" onClick={() => setActiveMood(null)}>
+              Tout voir
+            </button>
+          )}
+        </div>
+        <div className="hv-mood-strip">
+          {MOODS.map(m => (
+            <MoodChip
+              key={m.key}
+              mood={m}
+              active={activeMood === m.key}
+              count={moodCounts[m.key] || 0}
+              onClick={() => setActiveMood(v => v === m.key ? null : m.key)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ══ SPOTS — ouverts ou filtrés par mood ══ */}
       <div className="hv-section">
         <div className="hv-section-header">
-          <span className="hv-section-title">📍 Autour de moi</span>
+          <span className="hv-section-title">
+            {activeMood
+              ? `${sectionLabel} · ${moodSpots.length} spots`
+              : sectionLabel}
+          </span>
+          <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>
+        </div>
+        {displaySpots.length > 0 ? (
+          <div className="hv-scroll-row">
+            {displaySpots.map(s => (
+              <SpotCard key={s.id} spot={s} onClick={() => setSelected(s)} userPos={userPos} />
+            ))}
+          </div>
+        ) : (
+          <div className="hv-empty">
+            <span className="hv-empty-icon">🌙</span>
+            <span>Aucun spot pour cette ambiance ce soir</span>
+          </div>
+        )}
+      </div>
+
+      {/* ══ AUTOUR DE MOI ══ */}
+      <div className="hv-section">
+        <div className="hv-section-header">
+          <span className="hv-section-title">📍 Autour de toi</span>
           {userPos && <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>}
         </div>
         {!userPos ? (
@@ -189,7 +292,10 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
             {geoStatus === 'loading' ? '⏳ Localisation…' : '📍 Activer ma position'}
           </button>
         ) : nearbySpots.length === 0 ? (
-          <div className="hv-empty">Aucun spot dans un rayon de 3 km</div>
+          <div className="hv-empty">
+            <span className="hv-empty-icon">🗺️</span>
+            <span>Aucun spot dans un rayon de 3 km</span>
+          </div>
         ) : (
           <div className="hv-scroll-row">
             {nearbySpots.map(s => (
@@ -199,31 +305,12 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
         )}
       </div>
 
-      {/* ── Mood picker ── */}
-      <div className="hv-section">
-        <div className="hv-section-header">
-          <span className="hv-section-title">Quelle est ton ambiance ?</span>
-        </div>
-        <div className="hv-mood-strip">
-          {MOODS.map(m => (
-            <button
-              key={m.key}
-              className={`hv-mood-chip${activeMood === m.key ? ' active' : ''}`}
-              onClick={() => setActiveMood(v => v === m.key ? null : m.key)}
-            >
-              <span className="hv-mood-emoji">{m.emoji}</span>
-              <span className="hv-mood-label">{m.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Événements ce soir ── */}
+      {/* ══ ÉVÉNEMENTS CE SOIR ══ */}
       {featuredEvent && (
         <div className="hv-section">
           <div className="hv-section-header">
             <span className="hv-section-title">🎫 Ce soir à Toulouse</span>
-            <button className="hv-section-link" onClick={onOpenEvents}>Agenda complet</button>
+            <button className="hv-section-link" onClick={onOpenEvents}>Agenda</button>
           </div>
           <FeaturedEventCard event={featuredEvent} onOpen={onOpenEvents} />
           {otherEvents.length > 0 && (
@@ -234,29 +321,12 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
         </div>
       )}
 
-      {/* ── Spots ouverts / mood ── */}
-      <div className="hv-section">
-        <div className="hv-section-header">
-          <span className="hv-section-title">{sectionTitle}</span>
-          <button className="hv-section-link" onClick={onGoMap}>Tout voir</button>
-        </div>
-        {displaySpots.length > 0 ? (
-          <div className="hv-scroll-row">
-            {displaySpots.map(s => (
-              <SpotCard key={s.id} spot={s} onClick={() => setSelected(s)} userPos={userPos} />
-            ))}
-          </div>
-        ) : (
-          <div className="hv-empty">Aucun spot ouvert pour cette ambiance</div>
-        )}
-      </div>
-
-      {/* ── Coups de coeur ── */}
+      {/* ══ COUPS DE CŒUR ══ */}
       {topSpots.length > 0 && (
         <div className="hv-section">
           <div className="hv-section-header">
-            <span className="hv-section-title">❤️ Coups de cœur</span>
-            <button className="hv-section-link" onClick={onGoMap}>Voir sur carte</button>
+            <span className="hv-section-title">❤️ Coups de cœur Toulouse</span>
+            <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>
           </div>
           <div className="hv-scroll-row">
             {topSpots.map(s => (
@@ -282,4 +352,3 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
     </div>
   );
 }
-

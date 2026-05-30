@@ -6,11 +6,10 @@ import SpotCard from '../SpotCard/SpotCard';
 import SpotDetail from '../MapView/SpotDetail';
 import './SearchView.css';
 
-
 const SORTS = [
   { key: 'pertinence', label: 'Pertinence' },
   { key: 'note',       label: '★ Note' },
-  { key: 'distance',   label: '\U0001f4cd Proche' },
+  { key: 'distance',   label: '📍 Proche' },
 ];
 
 const CATEGORIES = Object.entries(CATEGORY_CONFIG).map(([name, cfg]) => ({
@@ -37,7 +36,7 @@ function QSpotCard({ spot, onClick, userPos }) {
       <div className="sv-qcard-body">
         <div className="sv-qcard-name">{spot.name}</div>
         <div className="sv-qcard-cat" style={{ color: cat.color }}>{cat.emoji} {spot.category}</div>
-        {dist != null && <div className="sv-qcard-dist">\U0001f4cd {formatDistance(dist)}</div>}
+        {dist != null && <div className="sv-qcard-dist">📍 {formatDistance(dist)}</div>}
       </div>
     </button>
   );
@@ -48,7 +47,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
   const [mood,     setMood]     = useState(null);
   const [category, setCategory] = useState(null);
   const [sort,     setSort]     = useState('pertinence');
-  const [viewMode, setViewMode] = useState('quartiers'); // 'quartiers' | 'list'
+  const [viewMode, setViewMode] = useState('quartiers');
   const [selected, setSelected] = useState(null);
   const [collapsed, setCollapsed] = useState({});
 
@@ -66,7 +65,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
       if (!matchMood(s, mood)) return false;
       if (category && s.category !== category) return false;
       if (!q) return true;
-      const hay = [s.name, s.category, s.quartier, s.address, s.description, ...(s.vibe_tags || [])]
+      const hay = [s.name, s.category, s.quartier, s.address, s.description, ...(s.tags || []), ...(s.moods || [])]
         .join(' ').toLowerCase();
       return hay.includes(q);
     });
@@ -79,7 +78,6 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
     return list;
   }, [spots, query, mood, category, sort, userPos]);
 
-  // Regroupement par quartier (tous les spots, pas filtrés)
   const quartierGroups = useMemo(() => {
     const map = {};
     spots.forEach((s) => {
@@ -101,7 +99,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
       {/* ── Zone sticky filtres ── */}
       <div className="search-sticky">
         <div className="search-field">
-          <span className="search-icon">\U0001f50d</span>
+          <span className="search-icon">🔍</span>
           <input
             autoFocus
             value={query}
@@ -109,14 +107,14 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
             placeholder="Spot, quartier, ambiance…"
           />
           {query && (
-            <button className="search-clear" onClick={() => setQuery('')} aria-label="Effacer">\xd7</button>
+            <button className="search-clear" onClick={() => setQuery('')} aria-label="Effacer">×</button>
           )}
         </div>
 
         <div className="search-filter-row">
           <span className="search-filter-label">Ambiance</span>
           {hasFilters && (
-            <button className="search-reset" onClick={clearAll}>R\xe9initialiser</button>
+            <button className="search-reset" onClick={clearAll}>Réinitialiser</button>
           )}
         </div>
         <div className="search-moods">
@@ -131,7 +129,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
           ))}
         </div>
 
-        <div className="search-filter-label" style={{ marginBottom: 8 }}>Cat\xe9gorie</div>
+        <div className="search-filter-label" style={{ marginBottom: 8 }}>Catégorie</div>
         <div className="search-cats">
           {availableCats.map((c) => (
             <button
@@ -154,13 +152,13 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
             className={`sv-toggle-btn${viewMode === 'quartiers' ? ' active' : ''}`}
             onClick={() => setViewMode('quartiers')}
           >
-            \U0001f3d8️ Quartiers
+            🏘️ Quartiers
           </button>
           <button
             className={`sv-toggle-btn${viewMode === 'list' ? ' active' : ''}`}
             onClick={() => setViewMode('list')}
           >
-            \U0001f4cb Liste
+            📋 Liste
           </button>
         </div>
       )}
@@ -215,13 +213,13 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
           })}
         </div>
       ) : (
-        /* ── Vue Liste (filtree ou mode liste) ── */
+        /* ── Vue Liste (filtrée ou mode liste) ── */
         <div className="search-list">
           {results.length === 0 ? (
             <div className="search-empty">
-              <div className="search-empty-emoji">\U0001faf5</div>
-              <p className="search-empty-title">Aucun spot trouv\xe9</p>
-              <p className="search-empty-sub">Essaie un autre mot-cl\xe9 ou enl\xe8ve un filtre.</p>
+              <div className="search-empty-emoji">🤷</div>
+              <p className="search-empty-title">Aucun spot trouvé</p>
+              <p className="search-empty-sub">Essaie un autre mot-clé ou enlève un filtre.</p>
               {hasFilters && (
                 <button className="btn-pill search-empty-cta" onClick={clearAll}>
                   Effacer les filtres
@@ -242,7 +240,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
                         key={s.key}
                         className={`sort-pill${sort === s.key ? ' active' : ''}`}
                         disabled={disabled}
-                        title={disabled ? "Active « Autour de moi » sur la carte" : undefined}
+                        title={disabled ? 'Active « Autour de moi » sur la carte' : undefined}
                         onClick={() => setSort(s.key)}
                       >
                         {s.label}

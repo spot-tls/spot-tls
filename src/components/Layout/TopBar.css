@@ -116,3 +116,21 @@
 }
 .topbar-agenda-btn:hover  { opacity: 0.88; }
 .topbar-agenda-btn:active { transform: scale(0.96); }
+
+/* ── Settings button ── */
+.topbar-settings-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: transform .15s ease, background .15s ease;
+}
+.topbar-settings-btn:hover {
+  background: var(--bg-card);
+  transform: rotate(30deg);
+}

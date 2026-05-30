@@ -1,11 +1,11 @@
 import './BottomNav.css';
 
 const TABS = [
-  { key: 'home',    label: 'Accueil',   emoji: '🏠' },
-  { key: 'map',     label: 'Carte',     emoji: '🗺️' },
-  { key: 'favs',    label: 'Favoris',   emoji: '❤️' },
-  { key: 'search',  label: 'Recherche', emoji: '🔍' },
-  { key: 'profile', label: 'Profil',    emoji: '👤' },
+  { key: 'home',   label: 'Accueil',   emoji: '🏠' },
+  { key: 'map',    label: 'Carte',     emoji: '🗺️' },
+  { key: 'favs',   label: 'Favoris',   emoji: '❤️' },
+  { key: 'search', label: 'Recherche', emoji: '🔍' },
+  { key: 'social', label: 'Soirée',    emoji: '🍸' },
 ];
 
 export default function BottomNav({ activePage, onChange, favCount = 0 }) {

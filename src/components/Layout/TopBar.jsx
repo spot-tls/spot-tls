@@ -1,6 +1,6 @@
 import './TopBar.css';
 
-export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents, onGoMap }) {
+export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents, onGoMap, onOpenSettings }) {
   return (
     <header className="topbar">
       <button className="topbar-brand" onClick={onGoMap} aria-label="Retour à la carte">
@@ -22,8 +22,12 @@ export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents,
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
-        <button className="btn-pill topbar-beta" onClick={onJoinBeta}>
-          Bêta
+        <button
+          className="topbar-settings-btn"
+          onClick={onOpenSettings}
+          aria-label="Paramètres"
+        >
+          ⚙️
         </button>
       </div>
     </header>

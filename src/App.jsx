@@ -5,11 +5,13 @@ import HomeView from './components/HomeView/HomeView';
 import MapView from './components/MapView/MapView';
 import SearchView from './components/SearchView/SearchView';
 import FavoritesView from './components/FavoritesView/FavoritesView';
-import ProfileView from './components/ProfileView/ProfileView';
+import SocialView from './components/SocialView/SocialView';
 import EventsView from './components/EventsView/EventsView';
 import BetaModal from './components/BetaModal/BetaModal';
 import SplashScreen from './components/Onboarding/SplashScreen';
 import ShareLanding from './components/ShareLanding/ShareLanding';
+import AuthModal from './components/Auth/AuthModal';
+import SettingsDrawer from './components/Settings/SettingsDrawer';
 import { useSpots } from './hooks/useSpots';
 import { updateSpotCoords } from './lib/supabaseAdmin';
 import { useFavorites } from './hooks/useFavorites';
@@ -18,16 +20,18 @@ import { useTheme } from './hooks/useTheme';
 import { useSpotEdits } from './hooks/useSpotEdits';
 import { useAdminMode } from './hooks/useAdminMode';
 import { useNewSpots } from './hooks/useNewSpots';
+import { useAuth } from './hooks/useAuth';
 
-// Détecte ?spot=ID dans l'URL pour la share landing
 const SHARE_SPOT_ID = new URLSearchParams(window.location.search).get('spot');
 
 export default function App() {
-  const [activePage,    setActivePage]    = useState('home');
-  const [showBeta,      setShowBeta]      = useState(false);
-  const [showSplash,    setShowSplash]    = useState(!SHARE_SPOT_ID); // pas de splash si lien partagé
-  const [showEvents,    setShowEvents]    = useState(false);
-  const [shareDismissed, setShareDismissed] = useState(false);
+  const [activePage,      setActivePage]      = useState('home');
+  const [showBeta,        setShowBeta]        = useState(false);
+  const [showSplash,      setShowSplash]      = useState(!SHARE_SPOT_ID);
+  const [showEvents,      setShowEvents]      = useState(false);
+  const [showAuth,        setShowAuth]        = useState(false);
+  const [showSettings,    setShowSettings]    = useState(false);
+  const [shareDismissed,  setShareDismissed]  = useState(false);
   const dismissSplash = () => setShowSplash(false);
 
   const { spots, loading, error, removeSpot, moveSpot }    = useSpots();
@@ -38,6 +42,8 @@ export default function App() {
   const { edits, saveEdit, editCount, exportJson }         = useSpotEdits();
   const { admin, handleSecretTap }                         = useAdminMode();
   const { newSpots, addSpot }                              = useNewSpots();
+  const { user, profile, needsProfile, isLoggedIn,
+          signInWithEmail, createProfile, signOut }        = useAuth();
 
   const mergedSpots = useMemo(() => {
     const base = spots.map((s) => (edits[s.id] ? { ...s, ...edits[s.id] } : s));
@@ -45,7 +51,9 @@ export default function App() {
   }, [spots, edits, newSpots]);
 
   const goMap  = () => setActivePage('map');
-  const goHome = () => setActivePage('home');
+
+  // Si l'user vient de cliquer un lien magic link → afficher le modal profil si besoin
+  const handleRequireAuth = () => setShowAuth(true);
 
   const centerScreen = (children) => (
     <div style={{
@@ -63,6 +71,7 @@ export default function App() {
         onToggleTheme={toggleTheme}
         onOpenEvents={() => setShowEvents(true)}
         onGoMap={goMap}
+        onOpenSettings={() => setShowSettings(true)}
       />
 
       {loading && centerScreen(<span>Chargement...</span>)}
@@ -137,25 +146,55 @@ export default function App() {
             />
           )}
 
-          {activePage === 'profile' && (
-            <ProfileView
+          {activePage === 'social' && (
+            <SocialView
+              currentUser={user}
+              currentProfile={profile}
               spots={mergedSpots}
-              favoriteIds={favoriteIds}
-              theme={theme}
-              onToggleTheme={toggleTheme}
-              onJoinBeta={() => setShowBeta(true)}
-              editCount={editCount}
-              onExportJson={() => exportJson(mergedSpots)}
-              admin={admin}
-              onSecretTap={handleSecretTap}
+              userPos={userPos}
+              onRequireAuth={handleRequireAuth}
+              onOpenSpot={(spot) => {
+                // Navigate to map and open spot detail
+                setActivePage('map');
+              }}
             />
           )}
         </>
       )}
 
       <BottomNav activePage={activePage} onChange={setActivePage} favCount={count} />
-      {showBeta   && <BetaModal onClose={() => setShowBeta(false)} />}
-      {showEvents && <EventsView onClose={() => setShowEvents(false)} admin={admin} />}
+
+      {/* ── Modals ── */}
+      {showBeta     && <BetaModal onClose={() => setShowBeta(false)} />}
+      {showEvents   && <EventsView onClose={() => setShowEvents(false)} admin={admin} />}
+
+      {/* Auth — apparaît si besoin de connexion OU si le user vient d'un magic link et n'a pas de profil */}
+      {(showAuth || needsProfile) && (
+        <AuthModal
+          onClose={() => setShowAuth(false)}
+          signInWithEmail={signInWithEmail}
+          createProfile={createProfile}
+          needsProfile={needsProfile}
+        />
+      )}
+
+      {/* Settings drawer */}
+      {showSettings && (
+        <SettingsDrawer
+          onClose={() => setShowSettings(false)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onJoinBeta={() => setShowBeta(true)}
+          admin={admin}
+          onSecretTap={handleSecretTap}
+          editCount={editCount}
+          onExportJson={() => exportJson(mergedSpots)}
+          onSignOut={signOut}
+          profile={profile}
+          onRequireAuth={handleRequireAuth}
+        />
+      )}
+
       {showSplash && (
         <SplashScreen onDismiss={dismissSplash} onJoinBeta={() => setShowBeta(true)} />
       )}

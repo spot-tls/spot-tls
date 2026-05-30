@@ -485,3 +485,13 @@
   color: var(--text-muted);
   flex-shrink: 0;
 }
+
+/* ── Entrée premium (ajout session Opus) ──────────────────────────── */
+.homeview { animation: view-in .32s cubic-bezier(.16,1,.3,1) both; scroll-behavior: smooth; overscroll-behavior-y: contain; }
+.hv-hero    { animation: section-rise .5s cubic-bezier(.16,1,.3,1) both; }
+.hv-section { animation: section-rise .55s cubic-bezier(.16,1,.3,1) both; }
+.hv-section:nth-of-type(2) { animation-delay: .05s; }
+.hv-section:nth-of-type(3) { animation-delay: .10s; }
+.hv-section:nth-of-type(4) { animation-delay: .15s; }
+.hv-section:nth-of-type(5) { animation-delay: .18s; }
+.hv-section:nth-of-type(6) { animation-delay: .20s; }

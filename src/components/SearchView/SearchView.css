@@ -254,3 +254,8 @@
 [data-theme="light"] .sv-qcard { background: #fff; border-color: rgba(0,0,0,.08); }
 [data-theme="light"] .sv-toggle-btn { background: #f3f4f6; }
 [data-theme="light"] .sv-toggle-btn.active { background: rgba(139,92,246,.12); }
+
+/* ── Entrée premium (ajout session Opus) ──────────────────────────── */
+.searchview { animation: view-in .3s cubic-bezier(.16,1,.3,1) both; }
+.sv-quartiers, .search-list { scroll-behavior: smooth; overscroll-behavior-y: contain; }
+.sv-qcard, .map-list-card { animation: section-rise .4s cubic-bezier(.16,1,.3,1) both; }

@@ -75,3 +75,22 @@ a { color: inherit; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ── Transitions de vue (ajout session Opus) ───────────────────────── */
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes section-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Respect des préférences d'accessibilité (motion réduit) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

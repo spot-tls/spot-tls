@@ -103,6 +103,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
         <div className="search-field">
           <span className="search-icon">\U0001f50d</span>
           <input
+            autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Spot, quartier, ambiance…"

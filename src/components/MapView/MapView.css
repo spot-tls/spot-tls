@@ -109,26 +109,40 @@
   background: none !important; border: none !important;
   display: flex !important; flex-direction: column !important;
   align-items: center !important; overflow: visible !important;
+  touch-action: manipulation; cursor: pointer;
+  transition: filter .15s ease;
 }
 .spot-pin {
-  width: 28px; height: 28px;
+  position: relative;
+  width: 34px; height: 34px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.75);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+  border: 2.5px solid rgba(255,255,255,0.85);
   display: flex; align-items: center; justify-content: center;
-  transition: transform .15s ease;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1);
 }
-.spot-pin-emoji { font-size: 13px; line-height: 1; display: block; }
+.spot-pin-emoji { font-size: 15px; line-height: 1; display: block; }
+
+/* petit dot vert "ouvert" */
+.spot-pin-dot {
+  position: absolute;
+  top: 1px; right: 1px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 2px solid rgba(20,18,30,0.9);
+}
+.spot-pin-dot.on { background: #4ade80; box-shadow: 0 0 4px #4ade8099; }
+
 .spot-pin-tail {
   width: 0; height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid #EC4899;
-  margin-top: -1px;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 10px solid #EC4899;
+  margin-top: -2px;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4));
+  transition: border-top-color .15s ease;
 }
-.spot-pin-wrap { touch-action: manipulation; cursor: pointer; }
-.spot-pin-wrap:hover .spot-pin { transform: scale(1.15) translateY(-3px); }
+.spot-pin-wrap:hover .spot-pin { transform: scale(1.18) translateY(-4px); }
+.spot-pin-wrap:active .spot-pin { transform: scale(0.92); }
 
 /* ── Dots compact (zoom < 15) ── */
 .spot-dot-wrap {
@@ -136,13 +150,12 @@
   overflow: visible !important; cursor: pointer;
 }
 .spot-dot {
-  width: 10px; height: 10px;
+  width: 11px; height: 11px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.6);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.7);
   transition: transform .15s ease;
 }
-.spot-dot-wrap:hover .spot-dot { transform: scale(1.5); }
+.spot-dot-wrap:hover .spot-dot { transform: scale(1.6); }
 
 /* ───────── SpotDetail — glassmorphism premium ───────── */
 .sd-overlay {

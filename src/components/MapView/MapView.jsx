@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import { getCatConfig, CLOSED_PIN_COLOR, MOODS, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
@@ -21,23 +21,29 @@ function pinHtml(spot, open, compact) {
   const cat = getCatConfig(spot.category);
   const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
   const confirmed_closed = hasHours && open === false;
-  const opacity = confirmed_closed ? 0.5 : 1;
+  const opacity = confirmed_closed ? 0.45 : 1;
   const isNew = spot._isNew;
 
   if (compact) {
     const color = confirmed_closed ? '#4a4060' : cat.color;
+    const glow = confirmed_closed ? 'none' : '0 0 6px ' + cat.color + '99';
     return (
-      '<div class="spot-dot" style="background:' + color + ';opacity:' + opacity + ';'
+      '<div class="spot-dot" style="background:' + color + ';opacity:' + opacity
+      + ';box-shadow:' + glow + ';'
       + (isNew ? 'border:2px solid #4ade80;' : '') + '"></div>'
     );
   }
 
   const bg = confirmed_closed ? CLOSED_PIN_COLOR : cat.gradient;
+  const glowColor = confirmed_closed ? 'transparent' : cat.color + '66';
   const tailColor = confirmed_closed ? '#4a4060' : cat.color;
   return (
-    '<div class="spot-pin" style="background:' + bg + ';opacity:' + opacity + ';'
-    + (isNew ? 'border:2px solid #4ade80;' : '') + '">'
-    + '<span class="spot-pin-emoji">' + cat.emoji + '</span></div>'
+    '<div class="spot-pin" style="background:' + bg + ';opacity:' + opacity
+    + ';box-shadow:0 4px 14px ' + glowColor + ',0 2px 6px rgba(0,0,0,0.5);'
+    + (isNew ? 'outline:2px solid #4ade80;outline-offset:2px;' : '') + '">'
+    + '<span class="spot-pin-emoji">' + cat.emoji + '</span>'
+    + (open === true ? '<span class="spot-pin-dot on"></span>' : '')
+    + '</div>'
     + '<div class="spot-pin-tail" style="border-top-color:' + tailColor + ';opacity:' + opacity + '"></div>'
   );
 }
@@ -76,7 +82,7 @@ export default function MapView({
   const [editingSpot, setEditingSpot] = useState(null);
   const [placing,     setPlacing]     = useState(false);
   const [newCoords,   setNewCoords]   = useState(null);
-  const [zoom,        setZoom]        = useState(14);
+  const zoomRef = useRef(14);
 
   const categories = useMemo(() => {
     const counts = {};
@@ -89,6 +95,26 @@ export default function MapView({
       (!openOnly || isOpenNow(s)) && matchMood(s, mood) && (!category || s.category === category)),
     [spots, openOnly, mood, category]
   );
+
+  const filteredRef = useRef([]);
+
+  const renderMarkers = useCallback(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    const compact = zoomRef.current < 15;
+    layer.clearLayers();
+    filteredRef.current.forEach((spot) => {
+      const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
+      const open = hasHours ? isOpenNow(spot) : null;
+      const icon = L.divIcon({
+        className: compact ? 'spot-dot-wrap' : 'spot-pin-wrap',
+        html: pinHtml(spot, open, compact),
+        iconSize: compact ? [12, 12] : [34, 46],
+        iconAnchor: compact ? [6, 6] : [17, 46],
+      });
+      L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => setSelected(spot));
+    });
+  }, []);
 
   const openSpot = (spot) => { setSelected(spot); };
 
@@ -120,7 +146,10 @@ export default function MapView({
     const layer = L.layerGroup().addTo(map);
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
-    map.on('zoomend', () => setZoom(map.getZoom()));
+    map.on('zoomend', () => {
+      zoomRef.current = map.getZoom();
+      renderMarkers();
+    });
 
     // Rappel invalidateSize chaque fois que le conteneur redevient visible
     // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)
@@ -144,22 +173,9 @@ export default function MapView({
   }, []);
 
   useEffect(() => {
-    const layer = layerRef.current;
-    if (!layer) return;
-    const compact = zoom < 15;
-    layer.clearLayers();
-    filtered.forEach((spot) => {
-      const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
-      const open = hasHours ? isOpenNow(spot) : null;
-      const icon = L.divIcon({
-        className: compact ? 'spot-dot-wrap' : 'spot-pin-wrap',
-        html: pinHtml(spot, open, compact),
-        iconSize: compact ? [12, 12] : [30, 40],
-        iconAnchor: compact ? [6, 6] : [15, 40],
-      });
-      L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => openSpot(spot));
-    });
-  }, [filtered, zoom]);
+    filteredRef.current = filtered;
+    renderMarkers();
+  }, [filtered, renderMarkers]);
 
   useEffect(() => {
     if (!mapRef.current || !userPos) return;

@@ -1,16 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#EC4899"/>
-      <stop offset="100%" stop-color="#A78BFA"/>
-    </linearGradient>
-  </defs>
-  <rect width="192" height="192" rx="42" fill="#0F0E15"/>
-  <!-- Pin body -->
-  <ellipse cx="96" cy="82" rx="34" ry="34" fill="url(#g)"/>
-  <!-- Pin tail -->
-  <polygon points="80,106 112,106 96,138" fill="url(#g)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#0F0E15"/>
+
+  <!-- Pin / chevron -->
+  <path d="M178 298 L256 368 L334 298" fill="none" stroke="#E8604A" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+
   <!-- S letter -->
-  <text x="96" y="93" text-anchor="middle" font-family="system-ui,sans-serif"
-        font-weight="800" font-size="28" fill="white">S</text>
+  <text x="256" y="290" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-weight="700" font-size="208" fill="#F0EDE8">S</text>
+
+  <!-- Sparkle lines top-right of S -->
+  <line x1="342" y1="112" x2="363" y2="91" stroke="#E8604A" stroke-width="14" stroke-linecap="round"/>
+  <line x1="358" y1="138" x2="384" y2="128" stroke="#E8604A" stroke-width="14" stroke-linecap="round"/>
+  <line x1="330" y1="86" x2="336" y2="60" stroke="#E8604A" stroke-width="14" stroke-linecap="round"/>
 </svg>

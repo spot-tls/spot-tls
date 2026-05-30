@@ -342,6 +342,21 @@
 
 .hv-footer-pad { height: 28px; }
 
+.hv-locate-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.hv-locate-btn:hover { border-color: #EC4899; background: rgba(236,72,153,0.06); }
+.hv-locate-btn:disabled { opacity: .6; cursor: not-allowed; }
+
 /* ── Light theme ── */
 [data-theme="light"] .hv-spot-card,
 [data-theme="light"] .hv-event-pill { background: #fff; border-color: rgba(0,0,0,0.08); }

@@ -78,6 +78,8 @@ export default function App() {
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
               userPos={userPos}
+              geoStatus={geoStatus}
+              onLocate={locate}
               onGoMap={goMap}
               onOpenEvents={() => setShowEvents(true)}
               admin={admin}

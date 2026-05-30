@@ -114,7 +114,7 @@ function EventPill({ event, onClick }) {
   );
 }
 
-export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, onGoMap, onOpenEvents, admin, onAdminReposition, onAdminDelete }) {
+export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onGoMap, onOpenEvents, admin, onAdminReposition, onAdminDelete }) {
   const [activeMood, setActiveMood] = useState(null);
   const [selected,   setSelected]   = useState(null);
   const { text, sub } = greeting();
@@ -147,6 +147,15 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
   const featuredEvent = tonightEvents.find(e => e.featured) || tonightEvents[0] || null;
   const otherEvents   = tonightEvents.filter(e => e !== featuredEvent).slice(0, 2);
 
+  const nearbySpots = useMemo(() => {
+    if (!userPos) return [];
+    return [...spots]
+      .map(s => ({ ...s, _dist: distanceKm(userPos, { lat: s.lat, lng: s.lng }) }))
+      .filter(s => s._dist != null && s._dist < 3)
+      .sort((a, b) => a._dist - b._dist)
+      .slice(0, 8);
+  }, [spots, userPos]);
+
   const displaySpots = activeMood ? moodSpots : openSpots;
   const sectionTitle = activeMood
     ? `Spots ${MOODS.find(m => m.key === activeMood)?.label || ''}`
@@ -163,6 +172,31 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
         <button className="hv-cta-map" onClick={onGoMap}>
           🗺️ Explorer les spots
         </button>
+      </div>
+
+      {/* ── Autour de moi ── */}
+      <div className="hv-section">
+        <div className="hv-section-header">
+          <span className="hv-section-title">📍 Autour de moi</span>
+          {userPos && <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>}
+        </div>
+        {!userPos ? (
+          <button
+            className="hv-locate-btn"
+            onClick={onLocate}
+            disabled={geoStatus === 'loading'}
+          >
+            {geoStatus === 'loading' ? '⏳ Localisation…' : '📍 Activer ma position'}
+          </button>
+        ) : nearbySpots.length === 0 ? (
+          <div className="hv-empty">Aucun spot dans un rayon de 3 km</div>
+        ) : (
+          <div className="hv-scroll-row">
+            {nearbySpots.map(s => (
+              <SpotCard key={s.id} spot={s} onClick={() => setSelected(s)} userPos={userPos} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── Mood picker ── */}

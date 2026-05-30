@@ -398,8 +398,26 @@
 .sv-modal-submit:disabled { opacity: 0.5; }
 
 /* Picker spot */
-.sv-picker { max-height: 70vh; }
-.sv-spot-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.sv-picker { max-height: 80vh; display: flex; flex-direction: column; }
+.sv-picker-search {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  flex-shrink: 0;
+}
+.sv-picker-search:focus { border-color: #A78BFA; }
+.sv-spot-list {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+.sv-picker-empty { text-align: center; color: var(--text-muted); padding: 24px; font-size: 14px; }
 .sv-spot-row {
   display: flex;
   align-items: center;
@@ -431,3 +449,13 @@
   text-overflow: ellipsis;
 }
 .sv-spot-row-q { font-size: 11px; color: var(--text-muted); }
+.sv-spot-row-open {
+  font-size: 10px;
+  font-weight: 700;
+  color: #10B981;
+  background: #10B98122;
+  border-radius: 6px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+}
+.sv-avatar-img { border-radius: 50%; object-fit: cover; }

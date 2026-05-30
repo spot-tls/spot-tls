@@ -23,7 +23,6 @@ export function useSpots() {
             && !Number.isNaN(s.lat) && !Number.isNaN(s.lng)
         );
 
-        if (valid.length === 0) throw new Error('Supabase vide — bascule locale.');
         setSpots(valid);
       } catch (e) {
         // Fallback : données locales packagées au build

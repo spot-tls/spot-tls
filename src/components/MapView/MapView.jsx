@@ -147,8 +147,11 @@ export default function MapView({
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
     map.on('zoomend', () => {
+      const prevCompact = zoomRef.current < 15;
       zoomRef.current = map.getZoom();
-      renderMarkers();
+      const nowCompact = zoomRef.current < 15;
+      // Re-render uniquement si on franchit le seuil compact ↔ full
+      if (prevCompact !== nowCompact) renderMarkers();
     });
 
     // Rappel invalidateSize chaque fois que le conteneur redevient visible

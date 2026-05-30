@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { MOODS } from '../../utils/config';
+import { usePushNotifications } from '../../hooks/usePushNotifications';
 import './ProfileView.css';
 
 const PREF_KEY = 'spotfr_prefs_v1';
@@ -29,6 +30,28 @@ export default function ProfileView({
   const [feedback, setFeedback] = useState('');
   const [fbSent, setFbSent]     = useState(false);
   const [copied, setCopied]     = useState(false);
+  const [sending, setSending]   = useState(false);
+  const { status: pushStatus, subscribe } = usePushNotifications();
+
+  const sendTestNotif = async () => {
+    setSending(true);
+    try {
+      await fetch('/api/push/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': import.meta.env.VITE_ADMIN_SECRET || '',
+        },
+        body: JSON.stringify({
+          title: 'SpotTLS 🔥',
+          body: 'Ce soir à Toulouse — des events à ne pas rater !',
+          url: '/',
+        }),
+      });
+    } finally {
+      setSending(false);
+    }
+  };
 
   const favCount       = favoriteIds?.size ?? 0;
   const spotsCount     = spots?.length ?? 0;
@@ -113,6 +136,69 @@ export default function ProfileView({
               );
             })}
           </div>
+        </div>
+
+        {/* Notifications */}
+        <div className="pv-section">
+          <div className="pv-section-header">
+            <span className="pv-section-icon">🔔</span>
+            <div>
+              <div className="pv-section-title">Notifications</div>
+              <div className="pv-section-sub">Reçois les events du vendredi soir</div>
+            </div>
+          </div>
+          {pushStatus === 'unsupported' ? (
+            <div className="pv-row">
+              <div className="pv-row-left">
+                <span className="pv-row-icon">😕</span>
+                <div><div className="pv-row-label">Non supporté sur ce navigateur</div></div>
+              </div>
+            </div>
+          ) : pushStatus === 'granted' ? (
+            <div className="pv-row">
+              <div className="pv-row-left">
+                <span className="pv-row-icon">✅</span>
+                <div>
+                  <div className="pv-row-label">Notifications activées</div>
+                  <div className="pv-row-sub">Tu recevras les events chaque vendredi</div>
+                </div>
+              </div>
+            </div>
+          ) : pushStatus === 'denied' ? (
+            <div className="pv-row">
+              <div className="pv-row-left">
+                <span className="pv-row-icon">🚫</span>
+                <div>
+                  <div className="pv-row-label">Notifications bloquées</div>
+                  <div className="pv-row-sub">Autorise-les dans les réglages de ton navigateur</div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button className="pv-row" onClick={subscribe} disabled={pushStatus === 'loading'}>
+              <div className="pv-row-left">
+                <span className="pv-row-icon">🔔</span>
+                <div>
+                  <div className="pv-row-label">{pushStatus === 'loading' ? 'Activation…' : 'Activer les notifications'}</div>
+                  <div className="pv-row-sub">Events du vendredi · Soirées exceptionnelles</div>
+                </div>
+              </div>
+              <span className="pv-row-chevron">›</span>
+            </button>
+          )}
+
+          {admin && pushStatus === 'granted' && (
+            <button className="pv-row pv-admin-notif-btn" onClick={sendTestNotif} disabled={sending}>
+              <div className="pv-row-left">
+                <span className="pv-row-icon">📣</span>
+                <div>
+                  <div className="pv-row-label">{sending ? 'Envoi…' : 'Envoyer notif à tous les abonnés'}</div>
+                  <div className="pv-row-sub">Admin seulement</div>
+                </div>
+              </div>
+              <span className="pv-row-chevron">›</span>
+            </button>
+          )}
         </div>
 
         {/* Theme */}

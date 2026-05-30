@@ -5,8 +5,8 @@ import { isOpenNow } from '../../utils/isOpenNow';
 import './SocialView.css';
 
 const MOODS_LABELS = {
-  chill: '\U0001f33f Chill', branche: '⚡ Branché', chic: '\U0001f48e Chic',
-  underground: '\U0001f39b️ Underground', aprem: '☀️ Aprem', jusqu_au_bout: "\U0001f525 Jusqu'au bout",
+  chill: '🌿 Chill', branche: '⚡ Branché', chic: '💎 Chic',
+  underground: '🎛️ Underground', aprem: '☀️ Aprem', jusqu_au_bout: "🔥 Jusqu'au bout",
 };
 
 function Avatar({ profile, size = 38 }) {
@@ -16,7 +16,7 @@ function Avatar({ profile, size = 38 }) {
   }
   return (
     <div className="sv-avatar" style={{ width: size, height: size, background: profile.avatar_color || '#A78BFA', fontSize: size * 0.45 }}>
-      {profile.avatar_emoji || '\U0001f389'}
+      {profile.avatar_emoji || '🎉'}
     </div>
   );
 }
@@ -39,7 +39,7 @@ function ReviewCard({ review, spotsMap, onSpotClick }) {
       </div>
       {spot && (
         <button className="sv-review-spot" onClick={() => onSpotClick?.(spot)}>
-          <span className="sv-review-spot-icon" style={{ background: (cat?.color || '#A78BFA') + '22' }}>{cat?.emoji || '\U0001f4cd'}</span>
+          <span className="sv-review-spot-icon" style={{ background: (cat?.color || '#A78BFA') + '22' }}>{cat?.emoji || '📍'}</span>
           <div className="sv-review-spot-info">
             <span className="sv-review-spot-name">{spot.name}</span>
             {spot.quartier && <span className="sv-review-spot-q">{spot.quartier}</span>}
@@ -76,12 +76,12 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
   const [error,   setError]   = useState('');
 
   const MOODS = [
-    { key: 'chill',         label: '\U0001f33f Chill'         },
+    { key: 'chill',         label: '🌿 Chill'         },
     { key: 'branche',       label: '⚡ Branché'      },
-    { key: 'chic',          label: '\U0001f48e Chic'          },
-    { key: 'underground',   label: '\U0001f39b️ Underground' },
-    { key: 'aprem',         label: '☀️ Aprem'        },
-    { key: 'jusqu_au_bout', label: "\U0001f525 Jusqu'au bout" },
+    { key: 'chic',          label: '💎 Chic'          },
+    { key: 'underground',   label: '🎛️ Underground' },
+    { key: 'aprem',         label: '☀️ Aprem'       },
+    { key: 'jusqu_au_bout', label: "🔥 Jusqu'au bout" },
   ];
 
   async function handleSubmit(e) {
@@ -123,7 +123,7 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
           <div className="sv-char-count">{comment.length}/280</div>
           {error && <p className="sv-modal-error">{error}</p>}
           <button className="sv-modal-submit" type="submit" disabled={loading || rating === 0}>
-            {loading ? 'Envoi…' : '\U0001f4ee Publier mon avis'}
+            {loading ? 'Envoi…' : '📮 Publier mon avis'}
           </button>
         </form>
       </div>
@@ -176,8 +176,8 @@ function SpotPicker({ spots, userPos, onSelect, onClose }) {
         <input className="sv-picker-search" type="text" placeholder="Rechercher un spot…" value={search}
           onChange={e => { setSearch(e.target.value); setQuartier(''); }} autoFocus />
         <div className="sv-picker-sort">
-          <button className={`sv-sort-btn${sortMode==='open'  ? ' active' : ''}`} onClick={() => setSortMode('open')}>\U0001f7e2 Ouverts</button>
-          {hasGps && <button className={`sv-sort-btn${sortMode==='near' ? ' active' : ''}`} onClick={() => setSortMode('near')}>\U0001f4cd Près de moi</button>}
+          <button className={`sv-sort-btn${sortMode==='open'  ? ' active' : ''}`} onClick={() => setSortMode('open')}>🟢 Ouverts</button>
+          {hasGps && <button className={`sv-sort-btn${sortMode==='near' ? ' active' : ''}`} onClick={() => setSortMode('near')}>📍 Près de moi</button>}
           <button className={`sv-sort-btn${sortMode==='alpha' ? ' active' : ''}`} onClick={() => setSortMode('alpha')}>A–Z</button>
         </div>
         {!search && quartiers.length > 0 && (
@@ -199,7 +199,7 @@ function SpotPicker({ spots, userPos, onSelect, onClose }) {
                 <div className="sv-spot-row-info">
                   <span className="sv-spot-row-name">{s.name}</span>
                   <span className="sv-spot-row-q">
-                    {s.quartier && <span>\U0001f4cd {s.quartier}</span>}
+                    {s.quartier && <span>📍 {s.quartier}</span>}
                     {s._dist !== null && <span> · {fmtDist(s._dist)}</span>}
                   </span>
                 </div>
@@ -215,7 +215,7 @@ function SpotPicker({ spots, userPos, onSelect, onClose }) {
 
 function formatRelative(date) {
   const diff = (Date.now() - date.getTime()) / 1000;
-  if (diff < 60)    return "à l'instant";
+  if (diff < 60)    return "il y a quelques secondes";
   if (diff < 3600)  return `il y a ${Math.floor(diff/60)} min`;
   if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -304,7 +304,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
           </div>
         ) : (
           <div className="sv-login-prompt">
-            <span className="sv-login-icon">\U0001f464</span>
+            <span className="sv-login-icon">👤</span>
             <div>
               <div className="sv-login-title">Rejoins la communauté</div>
               <div className="sv-login-sub">Check-in, note tes soirées, partage avec Toulouse</div>
@@ -318,7 +318,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
 
       <div className="sv-actions">
         <button className="sv-action-btn sv-action-checkin" onClick={() => currentUser ? setShowCheckinPicker(true) : onRequireAuth()}>
-          \U0001f4cd J'y suis !
+          📍 J'y suis !
         </button>
         <button className="sv-action-btn sv-action-review" onClick={() => {
           if (!currentUser) { onRequireAuth(); return; }
@@ -335,7 +335,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
       )}
 
       <div className="sv-feed-header">
-        <span className="sv-feed-title">\U0001f5e3️ Ce que dit la communauté</span>
+        <span className="sv-feed-title">🗣️ Ce que dit la communauté</span>
         <button className="sv-refresh-btn" onClick={loadFeed}>↻</button>
       </div>
 
@@ -343,7 +343,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
         <div className="sv-loading">Chargement du feed…</div>
       ) : reviews.length === 0 ? (
         <div className="sv-empty">
-          <span className="sv-empty-icon">\U0001f319</span>
+          <span className="sv-empty-icon">🌙</span>
           <p>Sois le premier à partager ta soirée !</p>
         </div>
       ) : (

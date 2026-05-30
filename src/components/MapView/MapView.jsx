@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { getCatConfig, CLOSED_PIN_COLOR, MOODS, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
@@ -101,16 +104,15 @@ export default function MapView({
   const renderMarkers = useCallback(() => {
     const layer = layerRef.current;
     if (!layer) return;
-    const compact = zoomRef.current < 15;
     layer.clearLayers();
     filteredRef.current.forEach((spot) => {
       const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
       const open = hasHours ? isOpenNow(spot) : null;
       const icon = L.divIcon({
-        className: compact ? 'spot-dot-wrap' : 'spot-pin-wrap',
-        html: pinHtml(spot, open, compact),
-        iconSize: compact ? [12, 12] : [34, 46],
-        iconAnchor: compact ? [6, 6] : [17, 46],
+        className: 'spot-pin-wrap',
+        html: pinHtml(spot, open, false),
+        iconSize: [34, 46],
+        iconAnchor: [17, 46],
       });
       L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => setSelected(spot));
     });
@@ -143,16 +145,29 @@ export default function MapView({
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     const base = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(map);
     const lbl  = L.tileLayer(isDark ? LABELS_DARK : LABELS_LIGHT, { attribution: '', maxZoom: 19, pane: 'shadowPane' }).addTo(map);
-    const layer = L.layerGroup().addTo(map);
+    const layer = L.markerClusterGroup({
+      maxClusterRadius: 60,
+      disableClusteringAtZoom: 16,
+      spiderfyOnMaxZoom: false,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        const size  = count < 10 ? 38 : count < 30 ? 46 : 54;
+        return L.divIcon({
+          className: 'spot-cluster-wrap',
+          html: `<div class="spot-cluster" style="width:${size}px;height:${size}px;">
+                   <span class="spot-cluster-num">${count}</span>
+                   <div class="spot-cluster-ring"></div>
+                 </div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+      },
+    }).addTo(map);
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
-    map.on('zoomend', () => {
-      const prevCompact = zoomRef.current < 15;
-      zoomRef.current = map.getZoom();
-      const nowCompact = zoomRef.current < 15;
-      // Re-render uniquement si on franchit le seuil compact ↔ full
-      if (prevCompact !== nowCompact) renderMarkers();
-    });
+    map.on('zoomend', () => { zoomRef.current = map.getZoom(); });
 
     // Rappel invalidateSize chaque fois que le conteneur redevient visible
     // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)

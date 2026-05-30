@@ -144,18 +144,53 @@
 .spot-pin-wrap:hover .spot-pin { transform: scale(1.18) translateY(-4px); }
 .spot-pin-wrap:active .spot-pin { transform: scale(0.92); }
 
-/* ── Dots compact (zoom < 15) ── */
-.spot-dot-wrap {
-  background: none !important; border: none !important;
-  overflow: visible !important; cursor: pointer;
+/* ── Clusters Snap Map style ── */
+.spot-cluster-wrap {
+  background: none !important;
+  border: none !important;
+  overflow: visible !important;
 }
-.spot-dot {
-  width: 11px; height: 11px;
+.spot-cluster {
+  position: relative;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.7);
-  transition: transform .15s ease;
+  background: linear-gradient(135deg, #EC4899, #A78BFA);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 4px rgba(236,72,153,0.2), 0 4px 16px rgba(167,139,250,0.5);
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease;
+  animation: cluster-pulse 2.5s ease-in-out infinite;
 }
-.spot-dot-wrap:hover .spot-dot { transform: scale(1.6); }
+.spot-cluster:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 6px rgba(236,72,153,0.25), 0 6px 24px rgba(167,139,250,0.65);
+}
+.spot-cluster-num {
+  font-size: 13px; font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.03em;
+  position: relative; z-index: 2;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.spot-cluster-ring {
+  position: absolute; inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(236,72,153,0.35);
+  animation: cluster-ring 2.5s ease-in-out infinite;
+}
+@keyframes cluster-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(236,72,153,0.2), 0 4px 16px rgba(167,139,250,0.5); }
+  50%       { box-shadow: 0 0 0 7px rgba(236,72,153,0.12), 0 6px 22px rgba(167,139,250,0.65); }
+}
+@keyframes cluster-ring {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50%       { transform: scale(1.1); opacity: 0.2; }
+}
+
+/* Override styles par défaut de leaflet.markercluster */
+.leaflet-cluster-anim .leaflet-marker-icon,
+.leaflet-cluster-anim .leaflet-marker-shadow {
+  transition: left .3s ease, top .3s ease;
+}
 
 /* ───────── SpotDetail — glassmorphism premium ───────── */
 .sd-overlay {

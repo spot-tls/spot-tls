@@ -44,7 +44,7 @@ export default function App() {
   const { admin, handleSecretTap }                         = useAdminMode();
   const { newSpots, addSpot }                              = useNewSpots();
   const { user, profile, needsProfile, isLoggedIn,
-          signInWithEmail, createProfile, signOut }        = useAuth();
+          signInWithEmail, signInWithGoogle, createProfile, signOut } = useAuth();
 
   const mergedSpots = useMemo(() => {
     const base = spots.map((s) => (edits[s.id] ? { ...s, ...edits[s.id] } : s));

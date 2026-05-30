@@ -33,8 +33,68 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
+
+    <!-- Loader PWA -->
+    <style>
+      #app-loader {
+        position: fixed; inset: 0; z-index: 99999;
+        background: #100B1E;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 16px;
+        transition: opacity 0.4s ease;
+      }
+      #app-loader.hidden { opacity: 0; pointer-events: none; }
+      .al-logo {
+        width: 72px; height: 72px; border-radius: 20px;
+        background: linear-gradient(135deg, #EC4899, #A78BFA);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 1px;
+        box-shadow: 0 8px 32px rgba(236,72,153,0.5);
+        animation: alBounce 0.6s cubic-bezier(.34,1.56,.64,1) both;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      @keyframes alBounce {
+        0%   { opacity: 0; transform: scale(0.5); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      .al-spot { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+      .al-tls  { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.75); letter-spacing: 1.5px; }
+      .al-bar  { width: 48px; height: 3px; border-radius: 2px; background: #2d2040; overflow: hidden; }
+      .al-bar-fill {
+        height: 100%; border-radius: 2px;
+        background: linear-gradient(90deg, #EC4899, #A78BFA);
+        animation: alLoad 1.2s ease-in-out infinite;
+      }
+      @keyframes alLoad {
+        0%   { width: 0%; margin-left: 0%; }
+        50%  { width: 70%; margin-left: 15%; }
+        100% { width: 0%; margin-left: 100%; }
+      }
+    </style>
   </head>
   <body>
+    <!-- Loader avant hydration React -->
+    <div id="app-loader">
+      <div class="al-logo">
+        <span class="al-spot">Spot</span>
+        <span class="al-tls">TLS</span>
+      </div>
+      <div class="al-bar"><div class="al-bar-fill"></div></div>
+    </div>
+    <script>
+      (function() {
+        var obs = new MutationObserver(function() {
+          var root = document.getElementById('root');
+          if (root && root.childElementCount > 0) {
+            var loader = document.getElementById('app-loader');
+            if (loader) { loader.classList.add('hidden'); setTimeout(function(){ loader.remove(); }, 500); }
+            obs.disconnect();
+          }
+        });
+        obs.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

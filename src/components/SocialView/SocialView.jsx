@@ -5,42 +5,28 @@ import { isOpenNow } from '../../utils/isOpenNow';
 import './SocialView.css';
 
 const MOODS_LABELS = {
-  chill: '🌿 Chill', branche: '⚡ Branché', chic: '💎 Chic',
-  underground: '🎛️ Underground', aprem: '☀️ Aprem', jusqu_au_bout: "🔥 Jusqu'au bout",
+  chill: '\U0001f33f Chill', branche: '⚡ Branché', chic: '\U0001f48e Chic',
+  underground: '\U0001f39b️ Underground', aprem: '☀️ Aprem', jusqu_au_bout: "\U0001f525 Jusqu'au bout",
 };
 
-/* ── Avatar ── */
 function Avatar({ profile, size = 38 }) {
   if (!profile) return <div className="sv-avatar-placeholder" style={{ width: size, height: size }} />;
   if (profile.avatar_url) {
-    return (
-      <img
-        className="sv-avatar sv-avatar-img"
-        src={profile.avatar_url}
-        alt={profile.username}
-        style={{ width: size, height: size }}
-      />
-    );
+    return <img className="sv-avatar sv-avatar-img" src={profile.avatar_url} alt={profile.username} style={{ width: size, height: size }} />;
   }
   return (
-    <div
-      className="sv-avatar"
-      style={{ width: size, height: size, background: profile.avatar_color || '#A78BFA', fontSize: size * 0.45 }}
-    >
-      {profile.avatar_emoji || '🎉'}
+    <div className="sv-avatar" style={{ width: size, height: size, background: profile.avatar_color || '#A78BFA', fontSize: size * 0.45 }}>
+      {profile.avatar_emoji || '\U0001f389'}
     </div>
   );
 }
 
-/* ── Review Card ── */
 function ReviewCard({ review, spotsMap, onSpotClick }) {
   const rating = review.rating || 0;
   const stars  = '★'.repeat(rating) + '☆'.repeat(Math.max(0, 5 - rating));
   const spot   = spotsMap?.[review.spot_id] || null;
   const cat    = spot ? getCatConfig(spot.category) : null;
-  const date   = new Date(review.created_at);
-  const rel    = formatRelative(date);
-
+  const rel    = formatRelative(new Date(review.created_at));
   return (
     <div className="sv-review-card">
       <div className="sv-review-header">
@@ -49,16 +35,14 @@ function ReviewCard({ review, spotsMap, onSpotClick }) {
           <span className="sv-review-username">{review.profiles?.username || 'Anonyme'}</span>
           <span className="sv-review-time">{rel}</span>
         </div>
-        <div className="sv-review-rating" title={`${rating}/5`}>{stars}</div>
+        <div className="sv-review-rating">{stars}</div>
       </div>
       {spot && (
         <button className="sv-review-spot" onClick={() => onSpotClick?.(spot)}>
-          <span className="sv-review-spot-icon" style={{ background: (cat?.color || '#A78BFA') + '22' }}>
-            {cat?.emoji || '📍'}
-          </span>
+          <span className="sv-review-spot-icon" style={{ background: (cat?.color || '#A78BFA') + '22' }}>{cat?.emoji || '\U0001f4cd'}</span>
           <div className="sv-review-spot-info">
             <span className="sv-review-spot-name">{spot.name}</span>
-            {spot.quartier && <span className="sv-review-spot-q">📍 {spot.quartier}</span>}
+            {spot.quartier && <span className="sv-review-spot-q">{spot.quartier}</span>}
           </div>
           <span className="sv-review-spot-arrow">›</span>
         </button>
@@ -69,7 +53,6 @@ function ReviewCard({ review, spotsMap, onSpotClick }) {
   );
 }
 
-/* ── Checkin actif ── */
 function ActiveCheckin({ checkin, spot, onCheckout }) {
   if (!checkin) return null;
   return (
@@ -85,7 +68,6 @@ function ActiveCheckin({ checkin, spot, onCheckout }) {
   );
 }
 
-/* ── Modal Laisser un avis ── */
 function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
   const [rating,  setRating]  = useState(0);
   const [mood,    setMood]    = useState('');
@@ -94,12 +76,12 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
   const [error,   setError]   = useState('');
 
   const MOODS = [
-    { key: 'chill',         label: '🌿 Chill'         },
-    { key: 'branche',       label: '⚡ Branché'        },
-    { key: 'chic',          label: '💎 Chic'           },
-    { key: 'underground',   label: '🎛️ Underground'    },
-    { key: 'aprem',         label: '☀️ Aprem'          },
-    { key: 'jusqu_au_bout', label: "🔥 Jusqu'au bout"  },
+    { key: 'chill',         label: '\U0001f33f Chill'         },
+    { key: 'branche',       label: '⚡ Branché'      },
+    { key: 'chic',          label: '\U0001f48e Chic'          },
+    { key: 'underground',   label: '\U0001f39b️ Underground' },
+    { key: 'aprem',         label: '☀️ Aprem'        },
+    { key: 'jusqu_au_bout', label: "\U0001f525 Jusqu'au bout" },
   ];
 
   async function handleSubmit(e) {
@@ -108,22 +90,14 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
     setLoading(true); setError('');
     try {
       const { error: err } = await supabase.from('reviews').insert({
-        user_id:    userId,
-        spot_id:    spot.id,
-        checkin_id: checkinId || null,
-        rating,
-        mood:       mood || null,
-        comment:    comment.trim() || null,
-        is_public:  true,
+        user_id: userId, spot_id: spot.id, checkin_id: checkinId || null,
+        rating, mood: mood || null, comment: comment.trim() || null, is_public: true,
       });
       if (err) throw err;
-      onSubmit();
-      onClose();
+      onSubmit(); onClose();
     } catch (err) {
       setError(err.message || "Erreur lors de l'envoi");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   return (
@@ -145,18 +119,11 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
             ))}
           </div>
           <div className="sv-modal-label">Ton post (optionnel)</div>
-          <textarea
-            className="sv-textarea"
-            placeholder="C'était comment ce soir ? Partage avec la communauté…"
-            value={comment}
-            onChange={e => setComment(e.target.value)}
-            rows={3}
-            maxLength={280}
-          />
+          <textarea className="sv-textarea" placeholder="C'était comment ce soir ? Partage avec la communauté…" value={comment} onChange={e => setComment(e.target.value)} rows={3} maxLength={280} />
           <div className="sv-char-count">{comment.length}/280</div>
           {error && <p className="sv-modal-error">{error}</p>}
           <button className="sv-modal-submit" type="submit" disabled={loading || rating === 0}>
-            {loading ? 'Envoi…' : '📮 Publier mon avis'}
+            {loading ? 'Envoi…' : '\U0001f4ee Publier mon avis'}
           </button>
         </form>
       </div>
@@ -164,45 +131,77 @@ function ReviewModal({ spot, checkinId, userId, onClose, onSubmit }) {
   );
 }
 
-/* ── Picker spot avec recherche ── */
-function SpotPicker({ spots, onSelect, onClose }) {
-  const [search, setSearch] = useState('');
+function distM(lat1, lon1, lat2, lon2) {
+  const R = 6371000, dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function fmtDist(m) { return m < 1000 ? Math.round(m)+'m' : (m/1000).toFixed(1)+'km'; }
 
-  const filtered = (spots || [])
-    .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.quartier || '').toLowerCase().includes(search.toLowerCase()))
+function SpotPicker({ spots, userPos, onSelect, onClose }) {
+  const [search,   setSearch]   = useState('');
+  const [quartier, setQuartier] = useState('');
+  const [sortMode, setSortMode] = useState('open');
+
+  const quartiers = [...new Set((spots||[]).map(s => s.quartier).filter(Boolean))].sort();
+  const hasGps = !!userPos;
+
+  const withDist = (spots||[]).map(s => ({
+    ...s,
+    _dist: (userPos && s.lat && s.lng) ? distM(userPos.lat, userPos.lng, s.lat, s.lng) : null,
+  }));
+
+  const filtered = withDist
+    .filter(s => {
+      if (quartier && s.quartier !== quartier) return false;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return s.name.toLowerCase().includes(q) || (s.quartier||'').toLowerCase().includes(q);
+    })
     .sort((a, b) => {
-      const aOpen = a.hours && Object.keys(a.hours).length > 0 && isOpenNow(a);
-      const bOpen = b.hours && Object.keys(b.hours).length > 0 && isOpenNow(b);
-      if (aOpen && !bOpen) return -1;
-      if (!aOpen && bOpen) return 1;
+      if (sortMode === 'near' && a._dist !== null && b._dist !== null) return a._dist - b._dist;
+      if (sortMode === 'alpha') return a.name.localeCompare(b.name);
+      const aO = a.hours && Object.keys(a.hours).length > 0 && isOpenNow(a);
+      const bO = b.hours && Object.keys(b.hours).length > 0 && isOpenNow(b);
+      if (aO && !bO) return -1; if (!aO && bO) return 1;
       return a.name.localeCompare(b.name);
     })
-    .slice(0, 40);
+    .slice(0, 50);
 
   return (
     <div className="sv-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="sv-modal sv-picker">
         <button className="sv-modal-close" onClick={onClose}>×</button>
         <h3 className="sv-modal-title">Tu es où ?</h3>
-        <input
-          className="sv-picker-search"
-          type="text"
-          placeholder="Rechercher un spot…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          autoFocus
-        />
+        <input className="sv-picker-search" type="text" placeholder="Rechercher un spot…" value={search}
+          onChange={e => { setSearch(e.target.value); setQuartier(''); }} autoFocus />
+        <div className="sv-picker-sort">
+          <button className={`sv-sort-btn${sortMode==='open'  ? ' active' : ''}`} onClick={() => setSortMode('open')}>\U0001f7e2 Ouverts</button>
+          {hasGps && <button className={`sv-sort-btn${sortMode==='near' ? ' active' : ''}`} onClick={() => setSortMode('near')}>\U0001f4cd Près de moi</button>}
+          <button className={`sv-sort-btn${sortMode==='alpha' ? ' active' : ''}`} onClick={() => setSortMode('alpha')}>A–Z</button>
+        </div>
+        {!search && quartiers.length > 0 && (
+          <div className="sv-picker-quartiers">
+            <button className={`sv-quartier-chip${quartier==='' ? ' active' : ''}`} onClick={() => setQuartier('')}>Tous</button>
+            {quartiers.map(q => (
+              <button key={q} className={`sv-quartier-chip${quartier===q ? ' active' : ''}`} onClick={() => setQuartier(v => v===q ? '' : q)}>{q}</button>
+            ))}
+          </div>
+        )}
         <div className="sv-spot-list">
           {filtered.length === 0 && <div className="sv-picker-empty">Aucun spot trouvé</div>}
           {filtered.map(s => {
-            const cat    = getCatConfig(s.category);
+            const cat = getCatConfig(s.category);
             const isOpen = s.hours && Object.keys(s.hours).length > 0 && isOpenNow(s);
             return (
               <button key={s.id} className="sv-spot-row" onClick={() => onSelect(s)}>
-                <span className="sv-spot-row-icon" style={{ background: cat.color + '22' }}>{cat.emoji}</span>
+                <span className="sv-spot-row-icon" style={{ background: cat.color+'22' }}>{cat.emoji}</span>
                 <div className="sv-spot-row-info">
                   <span className="sv-spot-row-name">{s.name}</span>
-                  {s.quartier && <span className="sv-spot-row-q">📍 {s.quartier}</span>}
+                  <span className="sv-spot-row-q">
+                    {s.quartier && <span>\U0001f4cd {s.quartier}</span>}
+                    {s._dist !== null && <span> · {fmtDist(s._dist)}</span>}
+                  </span>
                 </div>
                 {isOpen && <span className="sv-spot-row-open">Ouvert</span>}
               </button>
@@ -214,16 +213,14 @@ function SpotPicker({ spots, onSelect, onClose }) {
   );
 }
 
-/* ── Utilitaire date relative ── */
 function formatRelative(date) {
   const diff = (Date.now() - date.getTime()) / 1000;
   if (diff < 60)    return "à l'instant";
-  if (diff < 3600)  return `il y a ${Math.floor(diff / 60)} min`;
-  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`;
+  if (diff < 3600)  return `il y a ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
-/* ══════════════════════════════════════════════ */
 export default function SocialView({ currentUser, currentProfile, spots, userPos, onRequireAuth, onOpenSpot }) {
   const [reviews,            setReviews]           = useState([]);
   const [activeCheckin,      setActiveCheckin]      = useState(null);
@@ -232,11 +229,9 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
   const [showCheckinPicker,  setShowCheckinPicker]  = useState(false);
   const [reviewAfterCheckin, setReviewAfterCheckin] = useState(false);
 
-  // Map spot_id → spot pour lookup rapide (pas de FK join disponible)
-  const spotsMap = Object.fromEntries((spots || []).map(s => [s.id, s]));
+  const spotsMap   = Object.fromEntries((spots||[]).map(s => [s.id, s]));
   const activeSpot = activeCheckin ? (spotsMap[activeCheckin.spot_id] || null) : null;
 
-  /* Feed reviews — on joint profiles mais PAS spots (pas de FK) */
   const loadFeed = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -249,7 +244,6 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
     setLoading(false);
   }, []);
 
-  /* Check-in actif — sans join spots (pas de FK) */
   const loadActiveCheckin = useCallback(async () => {
     if (!currentUser) { setActiveCheckin(null); return; }
     const { data, error } = await supabase
@@ -280,13 +274,8 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
       if (error) throw error;
       setActiveCheckin(data);
       setShowCheckinPicker(false);
-      if (reviewAfterCheckin) {
-        setReviewTarget({ spot, checkinId: data?.id });
-        setReviewAfterCheckin(false);
-      }
-    } catch (err) {
-      console.error('Check-in error:', err.message);
-    }
+      if (reviewAfterCheckin) { setReviewTarget({ spot, checkinId: data?.id }); setReviewAfterCheckin(false); }
+    } catch (err) { console.error('Check-in error:', err.message); }
   }
 
   async function handleCheckout() {
@@ -296,18 +285,14 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
       const spot = activeSpot;
       setActiveCheckin(null);
       if (spot) setReviewTarget({ spot, checkinId: activeCheckin.id });
-    } catch (err) {
-      console.error('Checkout error:', err.message);
-    }
+    } catch (err) { console.error('Checkout error:', err.message); }
   }
 
   const myReviewCount  = reviews.filter(r => r.user_id === currentUser?.id).length;
-  const openSpotsCount = (spots || []).filter(s => s.hours && Object.keys(s.hours).length > 0 && isOpenNow(s)).length;
+  const openSpotsCount = (spots||[]).filter(s => s.hours && Object.keys(s.hours).length > 0 && isOpenNow(s)).length;
 
   return (
     <div className="socialview">
-
-      {/* ── Header user ── */}
       <div className="sv-header">
         {currentProfile ? (
           <div className="sv-user-row">
@@ -319,7 +304,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
           </div>
         ) : (
           <div className="sv-login-prompt">
-            <span className="sv-login-icon">👤</span>
+            <span className="sv-login-icon">\U0001f464</span>
             <div>
               <div className="sv-login-title">Rejoins la communauté</div>
               <div className="sv-login-sub">Check-in, note tes soirées, partage avec Toulouse</div>
@@ -329,42 +314,28 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
         )}
       </div>
 
-      {/* ── Check-in actif ── */}
       <ActiveCheckin checkin={activeCheckin} spot={activeSpot} onCheckout={handleCheckout} />
 
-      {/* ── Boutons actions ── */}
       <div className="sv-actions">
         <button className="sv-action-btn sv-action-checkin" onClick={() => currentUser ? setShowCheckinPicker(true) : onRequireAuth()}>
-          📍 J'y suis !
+          \U0001f4cd J'y suis !
         </button>
-        <button
-          className="sv-action-btn sv-action-review"
-          onClick={() => {
-            if (!currentUser) { onRequireAuth(); return; }
-            if (activeCheckin && activeSpot) {
-              setReviewTarget({ spot: activeSpot, checkinId: activeCheckin.id });
-            } else {
-              setReviewAfterCheckin(true);
-              setShowCheckinPicker(true);
-            }
-          }}
-        >
+        <button className="sv-action-btn sv-action-review" onClick={() => {
+          if (!currentUser) { onRequireAuth(); return; }
+          if (activeCheckin && activeSpot) { setReviewTarget({ spot: activeSpot, checkinId: activeCheckin.id }); }
+          else { setReviewAfterCheckin(true); setShowCheckinPicker(true); }
+        }}>
           ✍️ Laisser un avis
         </button>
       </div>
 
-      {/* ── Picker spot ── */}
       {showCheckinPicker && (
-        <SpotPicker
-          spots={spots || []}
-          onSelect={handleCheckin}
-          onClose={() => { setShowCheckinPicker(false); setReviewAfterCheckin(false); }}
-        />
+        <SpotPicker spots={spots||[]} userPos={userPos} onSelect={handleCheckin}
+          onClose={() => { setShowCheckinPicker(false); setReviewAfterCheckin(false); }} />
       )}
 
-      {/* ── Feed ── */}
       <div className="sv-feed-header">
-        <span className="sv-feed-title">🗣️ Ce que dit la communauté</span>
+        <span className="sv-feed-title">\U0001f5e3️ Ce que dit la communauté</span>
         <button className="sv-refresh-btn" onClick={loadFeed}>↻</button>
       </div>
 
@@ -372,7 +343,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
         <div className="sv-loading">Chargement du feed…</div>
       ) : reviews.length === 0 ? (
         <div className="sv-empty">
-          <span className="sv-empty-icon">🌙</span>
+          <span className="sv-empty-icon">\U0001f319</span>
           <p>Sois le premier à partager ta soirée !</p>
         </div>
       ) : (
@@ -383,7 +354,6 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
         </div>
       )}
 
-      {/* ── Modal review ── */}
       {reviewTarget && (
         <ReviewModal
           spot={reviewTarget.spot}

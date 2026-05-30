@@ -418,6 +418,50 @@
   flex: 1;
 }
 .sv-picker-empty { text-align: center; color: var(--text-muted); padding: 24px; font-size: 14px; }
+
+/* Tri mode */
+.sv-picker-sort {
+  display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;
+}
+.sv-sort-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.sv-sort-btn.active {
+  border-color: #A78BFA;
+  color: #A78BFA;
+  background: #A78BFA18;
+}
+
+/* Filtre quartiers */
+.sv-picker-quartiers {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; flex-shrink: 0;
+}
+.sv-quartier-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.sv-quartier-chip.active {
+  border-color: #EC4899;
+  color: #EC4899;
+  background: #EC489918;
+}
 .sv-spot-row {
   display: flex;
   align-items: center;

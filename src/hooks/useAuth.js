@@ -1,19 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-/**
- * useAuth — gestion session Supabase Auth
- * - user     : l'objet auth.user (ou null)
- * - profile  : l'entrée dans la table profiles (ou null)
- * - loading  : true pendant la récupération initiale
- * - needsProfile : true si user connecté mais pas encore de profil
- */
 export function useAuth() {
   const [user,    setUser]    = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* Récupère le profil depuis la table profiles */
   const fetchProfile = useCallback(async (userId) => {
     const { data, error } = await supabase
       .from('profiles')
@@ -22,11 +14,10 @@ export function useAuth() {
       .single();
     if (error && error.code !== 'PGRST116') console.error('fetchProfile:', error);
     setProfile(data || null);
+    return data || null;
   }, []);
 
-  /* Écoute les changements de session */
   useEffect(() => {
-    // Session initiale
     supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user ?? null;
       setUser(u);
@@ -34,7 +25,6 @@ export function useAuth() {
       else setLoading(false);
     });
 
-    // Écoute les changements (magic link callback, logout…)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
@@ -45,27 +35,36 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  /* Envoyer le magic link */
   const signInWithEmail = useCallback(async (email) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      options: { emailRedirectTo: window.location.origin },
     });
     if (error) throw error;
   }, []);
 
-  /* Créer le profil (après premier login) */
-  const createProfile = useCallback(async ({ username, avatarEmoji, avatarColor }) => {
+  const signInWithGoogle = useCallback(async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) throw error;
+  }, []);
+
+  const createProfile = useCallback(async ({ username, quartier, moods, birthYear, avatarUrl }) => {
     if (!user) throw new Error('Non connecté');
+    // Récupère l'avatar depuis Google si dispo
+    const googleAvatar = user.user_metadata?.avatar_url || null;
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         id: user.id,
         username,
-        avatar_emoji: avatarEmoji,
-        avatar_color: avatarColor,
+        full_name:   user.user_metadata?.full_name || null,
+        avatar_url:  avatarUrl || googleAvatar || null,
+        quartier:    quartier || null,
+        fav_moods:   moods || [],
+        birth_year:  birthYear || null,
       })
       .select()
       .single();
@@ -74,7 +73,6 @@ export function useAuth() {
     return data;
   }, [user]);
 
-  /* Mettre à jour le profil */
   const updateProfile = useCallback(async (updates) => {
     if (!user) throw new Error('Non connecté');
     const { data, error } = await supabase
@@ -88,7 +86,6 @@ export function useAuth() {
     return data;
   }, [user]);
 
-  /* Se déconnecter */
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -102,6 +99,7 @@ export function useAuth() {
     needsProfile: !!user && !profile,
     isLoggedIn: !!user && !!profile,
     signInWithEmail,
+    signInWithGoogle,
     createProfile,
     updateProfile,
     signOut,

@@ -200,6 +200,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
   const [reviewTarget,  setReviewTarget]  = useState(null); // spot à noter
   const [loading,       setLoading]       = useState(true);
   const [showCheckinPicker, setShowCheckinPicker] = useState(false);
+  const [reviewAfterCheckin, setReviewAfterCheckin] = useState(false);
 
   /* Charger le feed de reviews */
   const loadFeed = useCallback(async () => {
@@ -251,6 +252,10 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
     }).select('*, spots(id, name, category, quartier)').single();
     setActiveCheckin(data);
     setShowCheckinPicker(false);
+    if (reviewAfterCheckin) {
+      setReviewTarget({ spot, checkinId: data?.id });
+      setReviewAfterCheckin(false);
+    }
   }
 
   /* Check-out et proposer une review */
@@ -311,7 +316,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
           onClick={() => {
             if (!currentUser) { onRequireAuth(); return; }
             if (activeCheckin?.spots) setReviewTarget({ spot: activeCheckin.spots, checkinId: activeCheckin.id });
-            else setShowCheckinPicker(true);
+            else { setReviewAfterCheckin(true); setShowCheckinPicker(true); }
           }}
         >
           ✍️ Laisser un avis

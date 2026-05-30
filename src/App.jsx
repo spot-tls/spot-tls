@@ -23,11 +23,12 @@ import { useNewSpots } from './hooks/useNewSpots';
 import { useAuth } from './hooks/useAuth';
 
 const SHARE_SPOT_ID = new URLSearchParams(window.location.search).get('spot');
+const IS_AUTH_CALLBACK = window.location.hash.includes('access_token') || window.location.hash.includes('error=');
 
 export default function App() {
   const [activePage,      setActivePage]      = useState('home');
   const [showBeta,        setShowBeta]        = useState(false);
-  const [showSplash,      setShowSplash]      = useState(!SHARE_SPOT_ID);
+  const [showSplash,      setShowSplash]      = useState(!SHARE_SPOT_ID && !IS_AUTH_CALLBACK);
   const [showEvents,      setShowEvents]      = useState(false);
   const [showAuth,        setShowAuth]        = useState(false);
   const [showSettings,    setShowSettings]    = useState(false);
@@ -173,6 +174,8 @@ export default function App() {
         <AuthModal
           onClose={() => setShowAuth(false)}
           signInWithEmail={signInWithEmail}
+          signInWithGoogle={signInWithGoogle}
+          user={user}
           createProfile={createProfile}
           needsProfile={needsProfile}
         />

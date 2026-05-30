@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import L from 'leaflet';
-import 'leaflet.markercluster';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-import { getCatConfig, CLOSED_PIN_COLOR, MOODS, matchMood, QUARTIER_COLORS } from '../../utils/config';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { getCatConfig, CATEGORY_CONFIG, CLOSED_PIN_COLOR, MOODS, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import SpotDetail from './SpotDetail';
@@ -11,50 +9,64 @@ import SpotEditor from './SpotEditor';
 import AddSpotFlow from './AddSpotFlow';
 import './MapView.css';
 
-const TOULOUSE = [43.6045, 1.4442];
+// MapLibre travaille en [lng, lat] (l'inverse de Leaflet).
+const TOULOUSE = [1.4442, 43.6045];
+const TLS_BOUNDS = [[1.22, 43.47], [1.65, 43.74]]; // [SW, NE]
 
-const TLS_BOUNDS = L.latLngBounds([43.47, 1.22], [43.74, 1.65]);
-const TILE_DARK    = 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
-const TILE_LIGHT   = 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
-const LABELS_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
-const LABELS_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
-const TILE_ATTR    = '&copy; OpenStreetMap &copy; CARTO';
+// Styles vectoriels CARTO (gratuits, mêmes basemaps dark/light que la v1 raster,
+// mais en vectoriel = pan/zoom fluide). Pas de clé API requise.
+const STYLE_DARK  = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
-function pinHtml(spot, open, showName) {
-  const cat = getCatConfig(spot.category);
-  const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
-  const confirmed_closed = hasHours && open === false;
-  const opacity = confirmed_closed ? 0.45 : 1;
-  const isNew = spot._isNew;
+const isDarkTheme = () => document.documentElement.getAttribute('data-theme') !== 'light';
 
-  const bg = confirmed_closed ? CLOSED_PIN_COLOR : cat.gradient;
-  const glowColor = confirmed_closed ? 'transparent' : cat.color + '55';
-  const name = spot.name || '';
+// ── Génère une image de pin premium sur un canvas (cercle gradient + anneau
+//    blanc + ombre + emoji catégorie). Servie à MapLibre via map.addImage. ──
+function makePinImage(color, emoji, closed) {
+  const ratio = 2;
+  const size = 46;
+  const d = size * ratio;
+  const canvas = document.createElement('canvas');
+  canvas.width = d;
+  canvas.height = d;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(ratio, ratio);
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 13;
 
-  return (
-    '<div class="spot-pin-snap" style="opacity:' + opacity + ';">'
-    + '<div class="spot-pin-snap-circle" style="background:' + bg
-    + ';box-shadow:0 0 0 4px #fff,0 6px 20px ' + glowColor + ',0 2px 10px rgba(0,0,0,0.5);'
-    + (isNew ? 'outline:2.5px solid #4ade80;outline-offset:5px;' : '') + '">'
-    + '<span class="spot-pin-snap-emoji">' + cat.emoji + '</span>'
-    + (open === true ? '<div class="spot-pin-snap-dot"></div>' : '')
-    + '</div>'
-    + (showName ? '<div class="spot-pin-snap-label">' + name + '</div>' : '')
-    + '</div>'
-  );
+  // Ombre portée
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 7;
+  ctx.shadowOffsetY = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = closed ? CLOSED_PIN_COLOR : color;
+  ctx.fill();
+  ctx.restore();
+
+  // Anneau blanc
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = closed ? 'rgba(255,255,255,0.6)' : '#fff';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Emoji catégorie
+  ctx.globalAlpha = closed ? 0.7 : 1;
+  ctx.font = '14px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, cx, cy + 0.5);
+
+  return { data: ctx.getImageData(0, 0, d, d).data, width: d, height: d, pixelRatio: ratio };
 }
 
-const userIcon = L.divIcon({
-  className: 'user-pin-wrap',
-  html: '<div class="user-pin"></div>',
-  iconSize: [22, 22], iconAnchor: [11, 11],
-});
-
-const placingIcon = L.divIcon({
-  className: '',
-  html: '<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22D3EE);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 0 4px rgba(74,222,128,0.3);">+</div>',
-  iconSize: [32, 32], iconAnchor: [16, 16],
-});
+function iconKey(spot, closed) {
+  const base = CATEGORY_CONFIG[spot.category] ? spot.category : '__default';
+  return (closed ? 'closed:' : 'open:') + base;
+}
 
 export default function MapView({
   spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onEditSpot,
@@ -63,12 +75,10 @@ export default function MapView({
 }) {
   const mapEl   = useRef(null);
   const mapRef  = useRef(null);
-  const baseRef = useRef(null);
-  const lblRef  = useRef(null);
-  const layerRef = useRef(null);
-  const userRef  = useRef(null);
+  const userMarkerRef = useRef(null);
   const placingMarkerRef = useRef(null);
   const roRef   = useRef(null);
+  const styleReadyRef = useRef(false);
 
   const [openOnly,    setOpenOnly]    = useState(false);
   const [mood,        setMood]        = useState(null);
@@ -78,7 +88,12 @@ export default function MapView({
   const [editingSpot, setEditingSpot] = useState(null);
   const [placing,     setPlacing]     = useState(false);
   const [newCoords,   setNewCoords]   = useState(null);
-  const zoomRef = useRef(14);
+
+  // refs pour accéder à l'état courant dans les handlers MapLibre (capturés une fois)
+  const placingRef = useRef(false);
+  const repositioningRef = useRef(null);
+  useEffect(() => { placingRef.current = placing; }, [placing]);
+  useEffect(() => { repositioningRef.current = repositioningSpot; }, [repositioningSpot]);
 
   const categories = useMemo(() => {
     const counts = {};
@@ -92,26 +107,128 @@ export default function MapView({
     [spots, openOnly, mood, category]
   );
 
-  const filteredRef = useRef([]);
+  // Lookup spotId -> spot (pour retrouver le spot au clic sur un point)
+  const spotByIdRef = useRef({});
+  useEffect(() => {
+    const m = {};
+    filtered.forEach((s) => { m[String(s.id)] = s; });
+    spotByIdRef.current = m;
+  }, [filtered]);
 
-  const renderMarkers = useCallback(() => {
-    const layer = layerRef.current;
-    if (!layer) return;
-    const showName = zoomRef.current >= 16;
-    const iconW = showName ? 120 : 48;
-    layer.clearLayers();
-    filteredRef.current.forEach((spot) => {
-      const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
-      const open = hasHours ? isOpenNow(spot) : null;
-      const icon = L.divIcon({
-        className: '',
-        html: pinHtml(spot, open, showName),
-        iconSize: [iconW, 60],
-        iconAnchor: [iconW / 2, 48],
-      });
-      L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => setSelected(spot));
+  const geojson = useMemo(() => ({
+    type: 'FeatureCollection',
+    features: filtered.map((s) => {
+      const hasHours = !!s.hours && Object.keys(s.hours).length > 0;
+      const open = hasHours ? isOpenNow(s) : null;
+      const closed = hasHours && open === false;
+      return {
+        type: 'Feature',
+        properties: {
+          spotId: String(s.id),
+          name: s.name || '',
+          icon: iconKey(s, closed),
+        },
+        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+      };
+    }),
+  }), [filtered]);
+
+  // ── Enregistre toutes les images de pins (1 normale + 1 fermée par catégorie) ──
+  const registerImages = useCallback((map) => {
+    const cats = { ...CATEGORY_CONFIG, __default: { color: '#EC4899', emoji: '📍' } };
+    Object.entries(cats).forEach(([key, cfg]) => {
+      const openName = 'open:' + key;
+      const closedName = 'closed:' + key;
+      if (!map.hasImage(openName)) map.addImage(openName, makePinImage(cfg.color, cfg.emoji, false), { pixelRatio: 2 });
+      if (!map.hasImage(closedName)) map.addImage(closedName, makePinImage(cfg.color, cfg.emoji, true), { pixelRatio: 2 });
     });
   }, []);
+
+  // ── Ajoute source + layers (rappelé après chaque setStyle) ──
+  const addSpotLayers = useCallback((map) => {
+    registerImages(map);
+
+    if (!map.getSource('spots')) {
+      map.addSource('spots', {
+        type: 'geojson',
+        data: geojson,
+        cluster: true,
+        clusterRadius: 52,
+        clusterMaxZoom: 16,
+      });
+    }
+
+    // Halo flou sous les clusters (effet glow Snap Map)
+    if (!map.getLayer('cluster-glow')) {
+      map.addLayer({
+        id: 'cluster-glow',
+        type: 'circle',
+        source: 'spots',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': '#EC4899',
+          'circle-blur': 1,
+          'circle-opacity': 0.35,
+          'circle-radius': ['step', ['get', 'point_count'], 26, 10, 32, 50, 40],
+        },
+      });
+    }
+    if (!map.getLayer('clusters')) {
+      map.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'spots',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': ['step', ['get', 'point_count'], '#A78BFA', 10, '#C56FE0', 50, '#EC4899'],
+          'circle-radius': ['step', ['get', 'point_count'], 17, 10, 21, 50, 26],
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': 'rgba(255,255,255,0.9)',
+        },
+      });
+    }
+    if (!map.getLayer('cluster-count')) {
+      map.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'spots',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': ['get', 'point_count_abbreviated'],
+          'text-font': ['Open Sans Bold', 'Noto Sans Bold'],
+          'text-size': 13,
+        },
+        paint: { 'text-color': '#fff' },
+      });
+    }
+    // Points individuels (pins premium) + nom au zoom proche
+    if (!map.getLayer('unclustered')) {
+      map.addLayer({
+        id: 'unclustered',
+        type: 'symbol',
+        source: 'spots',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+          'icon-image': ['get', 'icon'],
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11, 0.62, 14, 0.85, 17, 1],
+          'icon-allow-overlap': true,
+          'icon-anchor': 'center',
+          'text-field': ['step', ['zoom'], '', 16.5, ['get', 'name']],
+          'text-font': ['Open Sans Bold', 'Noto Sans Bold'],
+          'text-size': 11,
+          'text-offset': [0, 1.5],
+          'text-anchor': 'top',
+          'text-optional': true,
+          'text-max-width': 9,
+        },
+        paint: {
+          'text-color': isDarkTheme() ? '#F5F0FF' : '#1A1825',
+          'text-halo-color': isDarkTheme() ? 'rgba(7,6,12,0.9)' : 'rgba(255,255,255,0.95)',
+          'text-halo-width': 1.4,
+        },
+      });
+    }
+  }, [geojson, registerImages]);
 
   const openSpot = (spot) => { setSelected(spot); };
 
@@ -128,142 +245,147 @@ export default function MapView({
     }
   }, [spots]);
 
+  // ── Init carte ──
   useEffect(() => {
     if (mapRef.current) return;
-    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    const map = L.map(mapEl.current, {
-      center: TOULOUSE, zoom: 14,
-      maxBounds: TLS_BOUNDS, maxBoundsViscosity: 0.85,
-      minZoom: 11, maxZoom: 18,
-      zoomControl: false,
+    const map = new maplibregl.Map({
+      container: mapEl.current,
+      style: isDarkTheme() ? STYLE_DARK : STYLE_LIGHT,
+      center: TOULOUSE,
+      zoom: 13.2,
+      minZoom: 11,
+      maxZoom: 18,
+      maxBounds: TLS_BOUNDS,
+      attributionControl: { compact: true },
+      dragRotate: false,
+      pitchWithRotate: false,
     });
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-    const base = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(map);
-    const lbl  = L.tileLayer(isDark ? LABELS_DARK : LABELS_LIGHT, { attribution: '', maxZoom: 19, pane: 'shadowPane' }).addTo(map);
-    const layer = L.markerClusterGroup({
-      maxClusterRadius: 60,
-      disableClusteringAtZoom: 16,
-      spiderfyOnMaxZoom: false,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        const size  = count < 10 ? 38 : count < 30 ? 46 : 54;
-        return L.divIcon({
-          className: 'spot-cluster-wrap',
-          html: `<div class="spot-cluster" style="width:${size}px;height:${size}px;">
-                   <span class="spot-cluster-num">${count}</span>
-                   <div class="spot-cluster-ring"></div>
-                 </div>`,
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
-        });
-      },
-    }).addTo(map);
-    mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
-    setTimeout(() => map.invalidateSize(), 300);
-    map.on('zoomend', () => {
-      const prev = zoomRef.current >= 16;
-      zoomRef.current = map.getZoom();
-      const next = zoomRef.current >= 16;
-      if (prev !== next) renderMarkers();
+    mapRef.current = map;
+    map.touchZoomRotate.disableRotation();
+
+    const onStyleLoad = () => {
+      styleReadyRef.current = true;
+      addSpotLayers(map);
+    };
+    map.on('load', onStyleLoad);
+    // setStyle (changement de thème) ré-émet 'styledata' : on ré-injecte les layers
+    map.on('styledata', () => {
+      if (styleReadyRef.current && !map.getSource('spots')) addSpotLayers(map);
     });
 
-    // Rappel invalidateSize chaque fois que le conteneur redevient visible
-    // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)
+    // ── Interactions ──
+    map.on('click', 'clusters', (e) => {
+      const f = e.features?.[0];
+      if (!f) return;
+      const clusterId = f.properties.cluster_id;
+      map.getSource('spots').getClusterExpansionZoom(clusterId).then((zoom) => {
+        map.easeTo({ center: f.geometry.coordinates, zoom, duration: 500 });
+      });
+    });
+    map.on('click', 'unclustered', (e) => {
+      if (placingRef.current || repositioningRef.current) return;
+      const f = e.features?.[0];
+      if (!f) return;
+      const spot = spotByIdRef.current[f.properties.spotId];
+      if (spot) setSelected(spot);
+    });
+    ['clusters', 'unclustered'].forEach((layer) => {
+      map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
+    });
+
+    // Clic "vide" pour placer / repositionner un spot (mode admin)
+    map.on('click', (e) => {
+      if (repositioningRef.current) {
+        map.getCanvas().style.cursor = '';
+        onRepositionSave?.(e.lngLat.lat, e.lngLat.lng);
+        return;
+      }
+      if (placingRef.current) {
+        const { lng, lat } = e.lngLat;
+        if (placingMarkerRef.current) placingMarkerRef.current.remove();
+        const el = document.createElement('div');
+        el.className = 'mlg-placing-pin';
+        el.textContent = '+';
+        placingMarkerRef.current = new maplibregl.Marker({ element: el })
+          .setLngLat([lng, lat]).addTo(map);
+        setPlacing(false);
+        setNewCoords({ lat, lng });
+        map.getCanvas().style.cursor = '';
+      }
+    });
+
     roRef.current = new ResizeObserver(() => {
-      if (mapEl.current?.offsetWidth > 0) map.invalidateSize();
+      if (mapEl.current?.offsetWidth > 0) map.resize();
     });
     roRef.current.observe(mapEl.current);
 
-    return () => roRef.current?.disconnect();
+    return () => { roRef.current?.disconnect(); map.remove(); mapRef.current = null; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Bascule thème dark/light ──
   useEffect(() => {
-    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (!map) return;
     const obs = new MutationObserver(() => {
-      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-      baseRef.current?.setUrl(isDark ? TILE_DARK : TILE_LIGHT);
-      lblRef.current?.setUrl(isDark ? LABELS_DARK : LABELS_LIGHT);
+      styleReadyRef.current = false;
+      map.setStyle(isDarkTheme() ? STYLE_DARK : STYLE_LIGHT);
+      map.once('styledata', () => { styleReadyRef.current = true; addSpotLayers(map); });
     });
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return () => obs.disconnect();
-  }, []);
+  }, [addSpotLayers]);
 
+  // ── Met à jour les données quand les filtres changent ──
   useEffect(() => {
-    filteredRef.current = filtered;
-    renderMarkers();
-  }, [filtered, renderMarkers]);
+    const map = mapRef.current;
+    if (!map) return;
+    const src = map.getSource('spots');
+    if (src) src.setData(geojson);
+  }, [geojson]);
 
+  // Resize quand on repasse en vue carte (le conteneur était caché)
   useEffect(() => {
-    if (!mapRef.current || !userPos) return;
-    if (!userRef.current) {
-      userRef.current = L.marker([userPos.lat, userPos.lng], { icon: userIcon }).addTo(mapRef.current);
+    if (viewMode === 'map') setTimeout(() => mapRef.current?.resize(), 60);
+  }, [viewMode]);
+
+  // ── Marqueur utilisateur ──
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !userPos) return;
+    if (!userMarkerRef.current) {
+      const el = document.createElement('div');
+      el.className = 'user-pin';
+      userMarkerRef.current = new maplibregl.Marker({ element: el })
+        .setLngLat([userPos.lng, userPos.lat]).addTo(map);
     } else {
-      userRef.current.setLatLng([userPos.lat, userPos.lng]);
+      userMarkerRef.current.setLngLat([userPos.lng, userPos.lat]);
     }
   }, [userPos]);
 
-  // Mode repositionnement
+  // Curseur crosshair en mode placement / repositionnement
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    if (!repositioningSpot) return;
-    map.getContainer().style.cursor = 'crosshair';
-    const handleClick = (e) => {
-      const { lat, lng } = e.latlng;
-      map.getContainer().style.cursor = '';
-      onRepositionSave?.(lat, lng);
-    };
-    map.once('click', handleClick);
-    return () => { map.off('click', handleClick); map.getContainer().style.cursor = ''; };
-  }, [repositioningSpot]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (!placing) {
-      if (placingMarkerRef.current) {
-        map.removeLayer(placingMarkerRef.current);
-        placingMarkerRef.current = null;
-      }
-      map.getContainer().style.cursor = '';
-      return;
-    }
-    map.getContainer().style.cursor = 'crosshair';
-    const handleClick = (e) => {
-      const { lat, lng } = e.latlng;
-      if (placingMarkerRef.current) map.removeLayer(placingMarkerRef.current);
-      placingMarkerRef.current = L.marker([lat, lng], { icon: placingIcon }).addTo(map);
-      setPlacing(false);
-      setNewCoords({ lat, lng });
-      map.getContainer().style.cursor = '';
-    };
-    map.once('click', handleClick);
-    return () => { map.off('click', handleClick); };
-  }, [placing]);
+    map.getCanvas().style.cursor = (placing || repositioningSpot) ? 'crosshair' : '';
+  }, [placing, repositioningSpot]);
 
   const surpriseMe = () => {
     if (!filtered.length) return;
     const s = filtered[Math.floor(Math.random() * filtered.length)];
-    mapRef.current?.flyTo([s.lat, s.lng], 16, { duration: 0.8 });
+    mapRef.current?.flyTo({ center: [s.lng, s.lat], zoom: 16, duration: 900 });
     setSelected(s);
   };
 
   const handleAddSave = (spotData) => {
     onAddSpot?.(spotData);
-    if (placingMarkerRef.current && mapRef.current) {
-      mapRef.current.removeLayer(placingMarkerRef.current);
-      placingMarkerRef.current = null;
-    }
+    if (placingMarkerRef.current) { placingMarkerRef.current.remove(); placingMarkerRef.current = null; }
     setNewCoords(null);
   };
 
   const cancelAdd = () => {
-    if (placingMarkerRef.current && mapRef.current) {
-      mapRef.current.removeLayer(placingMarkerRef.current);
-      placingMarkerRef.current = null;
-    }
+    if (placingMarkerRef.current) { placingMarkerRef.current.remove(); placingMarkerRef.current = null; }
     setNewCoords(null);
     setPlacing(false);
   };

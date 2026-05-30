@@ -51,6 +51,14 @@ export function matchMood(spot, moodKey) {
   const mood = MOODS.find((m) => m.key === moodKey);
   if (!mood) return true;
   if (mood.categories) return mood.categories.includes(spot.category);
-  const tags = (spot.vibe_tags || []).map((t) => t.toLowerCase());
-  return mood.keywords.some((kw) => tags.some((t) => t.includes(kw)));
+  // Le schéma Supabase expose `tags` et `moods` (arrays). matchMood lisait
+  // uniquement `vibe_tags` (inexistant en base) → les moods à mots-clés ne
+  // matchaient jamais. Corrigé : on lit tags + moods (+ vibe_tags en fallback).
+  const haystack = [
+    ...(spot.tags || []),
+    ...(spot.moods || []),
+    ...(spot.vibe_tags || []),
+  ].map((t) => String(t).toLowerCase());
+  if (haystack.some((t) => t === mood.key || t === mood.label.toLowerCase())) return true;
+  return mood.keywords.some((kw) => haystack.some((t) => t.includes(kw)));
 }

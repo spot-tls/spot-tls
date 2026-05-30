@@ -20,34 +20,26 @@ const LABELS_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}
 const LABELS_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
 const TILE_ATTR    = '&copy; OpenStreetMap &copy; CARTO';
 
-function pinHtml(spot, open, compact) {
+function pinHtml(spot, open, _compact) {
   const cat = getCatConfig(spot.category);
   const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
   const confirmed_closed = hasHours && open === false;
   const opacity = confirmed_closed ? 0.45 : 1;
   const isNew = spot._isNew;
 
-  if (compact) {
-    const color = confirmed_closed ? '#4a4060' : cat.color;
-    const glow = confirmed_closed ? 'none' : '0 0 6px ' + cat.color + '99';
-    return (
-      '<div class="spot-dot" style="background:' + color + ';opacity:' + opacity
-      + ';box-shadow:' + glow + ';'
-      + (isNew ? 'border:2px solid #4ade80;' : '') + '"></div>'
-    );
-  }
-
   const bg = confirmed_closed ? CLOSED_PIN_COLOR : cat.gradient;
-  const glowColor = confirmed_closed ? 'transparent' : cat.color + '66';
-  const tailColor = confirmed_closed ? '#4a4060' : cat.color;
+  const glowColor = confirmed_closed ? 'transparent' : cat.color + '55';
+
   return (
-    '<div class="spot-pin" style="background:' + bg + ';opacity:' + opacity
-    + ';box-shadow:0 4px 14px ' + glowColor + ',0 2px 6px rgba(0,0,0,0.5);'
-    + (isNew ? 'outline:2px solid #4ade80;outline-offset:2px;' : '') + '">'
-    + '<span class="spot-pin-emoji">' + cat.emoji + '</span>'
-    + (open === true ? '<span class="spot-pin-dot on"></span>' : '')
+    '<div class="spot-pin-wrap2" style="opacity:' + opacity + ';">'
+    + '<div class="spot-pin2" style="background:' + bg
+    + ';box-shadow:0 0 0 3.5px #fff,0 6px 18px ' + glowColor + ',0 2px 8px rgba(0,0,0,0.45);'
+    + (isNew ? 'outline:2.5px solid #4ade80;outline-offset:4px;' : '') + '">'
+    + '<span class="spot-pin2-emoji">' + cat.emoji + '</span>'
+    + (open === true ? '<span class="spot-pin2-dot"></span>' : '')
     + '</div>'
-    + '<div class="spot-pin-tail" style="border-top-color:' + tailColor + ';opacity:' + opacity + '"></div>'
+    + '<div class="spot-pin2-tail"></div>'
+    + '</div>'
   );
 }
 
@@ -109,10 +101,10 @@ export default function MapView({
       const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
       const open = hasHours ? isOpenNow(spot) : null;
       const icon = L.divIcon({
-        className: 'spot-pin-wrap',
+        className: '',
         html: pinHtml(spot, open, false),
-        iconSize: [34, 46],
-        iconAnchor: [17, 46],
+        iconSize: [44, 54],
+        iconAnchor: [22, 54],
       });
       L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => setSelected(spot));
     });

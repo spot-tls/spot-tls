@@ -104,8 +104,8 @@
   padding: 7px 14px;
 }
 
-/* ── Pins style Mix Snap/Plans ── */
-.spot-pin-wrap2 {
+/* ── Pins style Snap ── */
+.spot-pin-snap {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -114,43 +114,53 @@
   transition: transform .2s cubic-bezier(.34,1.56,.64,1);
   transform-origin: bottom center;
 }
-.spot-pin-wrap2:hover { transform: scale(1.15) translateY(-4px); }
-.spot-pin-wrap2:active { transform: scale(0.9); }
+.spot-pin-snap:hover  { transform: scale(1.15) translateY(-3px); }
+.spot-pin-snap:active { transform: scale(0.9); }
 
-.spot-pin2 {
+.spot-pin-snap-circle {
   position: relative;
-  width: 42px; height: 42px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  /* box-shadow injecté inline pour la couleur dynamique */
+  /* box-shadow injecté inline : border blanc 4px + glow coloré */
 }
 
-.spot-pin2-emoji {
-  font-size: 20px;
+.spot-pin-snap-emoji {
+  font-size: 22px;
   line-height: 1;
   display: block;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
 }
 
 /* dot vert "ouvert maintenant" */
-.spot-pin2-dot {
+.spot-pin-snap-dot {
   position: absolute;
   bottom: 1px; right: 1px;
-  width: 11px; height: 11px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   background: #4ade80;
   border: 2.5px solid #fff;
-  box-shadow: 0 0 5px #4ade8088;
+  box-shadow: 0 0 6px #4ade8099;
 }
 
-/* Petite queue discrète style Plans */
-.spot-pin2-tail {
-  width: 6px; height: 8px;
-  background: #fff;
-  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
-  margin-top: -1px;
-  opacity: 0.9;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+/* Label nom — visible uniquement zoom >= 16 */
+.spot-pin-snap-label {
+  margin-top: 6px;
+  padding: 3px 9px;
+  background: rgba(15, 14, 21, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  letter-spacing: -0.01em;
 }
 
 /* ── Clusters Snap Map style ── */

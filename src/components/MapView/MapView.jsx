@@ -20,7 +20,7 @@ const LABELS_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}
 const LABELS_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png';
 const TILE_ATTR    = '&copy; OpenStreetMap &copy; CARTO';
 
-function pinHtml(spot, open, _compact) {
+function pinHtml(spot, open, showName) {
   const cat = getCatConfig(spot.category);
   const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
   const confirmed_closed = hasHours && open === false;
@@ -29,16 +29,17 @@ function pinHtml(spot, open, _compact) {
 
   const bg = confirmed_closed ? CLOSED_PIN_COLOR : cat.gradient;
   const glowColor = confirmed_closed ? 'transparent' : cat.color + '55';
+  const name = spot.name || '';
 
   return (
-    '<div class="spot-pin-wrap2" style="opacity:' + opacity + ';">'
-    + '<div class="spot-pin2" style="background:' + bg
-    + ';box-shadow:0 0 0 3.5px #fff,0 6px 18px ' + glowColor + ',0 2px 8px rgba(0,0,0,0.45);'
-    + (isNew ? 'outline:2.5px solid #4ade80;outline-offset:4px;' : '') + '">'
-    + '<span class="spot-pin2-emoji">' + cat.emoji + '</span>'
-    + (open === true ? '<span class="spot-pin2-dot"></span>' : '')
+    '<div class="spot-pin-snap" style="opacity:' + opacity + ';">'
+    + '<div class="spot-pin-snap-circle" style="background:' + bg
+    + ';box-shadow:0 0 0 4px #fff,0 6px 20px ' + glowColor + ',0 2px 10px rgba(0,0,0,0.5);'
+    + (isNew ? 'outline:2.5px solid #4ade80;outline-offset:5px;' : '') + '">'
+    + '<span class="spot-pin-snap-emoji">' + cat.emoji + '</span>'
+    + (open === true ? '<div class="spot-pin-snap-dot"></div>' : '')
     + '</div>'
-    + '<div class="spot-pin2-tail"></div>'
+    + (showName ? '<div class="spot-pin-snap-label">' + name + '</div>' : '')
     + '</div>'
   );
 }
@@ -96,15 +97,17 @@ export default function MapView({
   const renderMarkers = useCallback(() => {
     const layer = layerRef.current;
     if (!layer) return;
+    const showName = zoomRef.current >= 16;
+    const iconW = showName ? 120 : 48;
     layer.clearLayers();
     filteredRef.current.forEach((spot) => {
       const hasHours = !!spot.hours && Object.keys(spot.hours).length > 0;
       const open = hasHours ? isOpenNow(spot) : null;
       const icon = L.divIcon({
         className: '',
-        html: pinHtml(spot, open, false),
-        iconSize: [44, 54],
-        iconAnchor: [22, 54],
+        html: pinHtml(spot, open, showName),
+        iconSize: [iconW, 60],
+        iconAnchor: [iconW / 2, 48],
       });
       L.marker([spot.lat, spot.lng], { icon }).addTo(layer).on('click', () => setSelected(spot));
     });
@@ -159,7 +162,12 @@ export default function MapView({
     }).addTo(map);
     mapRef.current = map; baseRef.current = base; lblRef.current = lbl; layerRef.current = layer;
     setTimeout(() => map.invalidateSize(), 300);
-    map.on('zoomend', () => { zoomRef.current = map.getZoom(); });
+    map.on('zoomend', () => {
+      const prev = zoomRef.current >= 16;
+      zoomRef.current = map.getZoom();
+      const next = zoomRef.current >= 16;
+      if (prev !== next) renderMarkers();
+    });
 
     // Rappel invalidateSize chaque fois que le conteneur redevient visible
     // (le MapView est monté caché via display:none — ça casse les dimensions Leaflet)

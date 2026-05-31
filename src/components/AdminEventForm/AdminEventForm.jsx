@@ -15,13 +15,14 @@ function field(label, children) {
   );
 }
 
-export default function AdminEventForm({ event, onClose, onSaved, onDeleted }) {
+export default function AdminEventForm({ event, onClose, onSaved, onDeleted, spots = [] }) {
   const isEdit = !!event;
 
   const [form, setForm] = useState({
     title:        event?.title        || '',
     category:     event?.category     || 'DJ Set',
     spot_name:    event?.spot_name    || '',
+    spot_id:      event?.spot_id      || '',
     quartier:     event?.quartier     || '',
     date:         event?.date         || '',
     time_start:   event?.time_start   || '',
@@ -33,6 +34,7 @@ export default function AdminEventForm({ event, onClose, onSaved, onDeleted }) {
     link:         event?.link         || '',
     featured:     event?.featured     || false,
   });
+  const [spotSearch, setSpotSearch] = useState('');
 
   const [saving,      setSaving]      = useState(false);
   const [deleting,    setDeleting]    = useState(false);
@@ -89,7 +91,37 @@ export default function AdminEventForm({ event, onClose, onSaved, onDeleted }) {
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
           ))}
-          {field('Lieu', <input className="aef-input" value={form.spot_name} onChange={(e) => set('spot_name', e.target.value)} placeholder="Le Rex" />)}
+          {field('Lieu (nom affiché)', <input className="aef-input" value={form.spot_name} onChange={(e) => set('spot_name', e.target.value)} placeholder="Le Rex" />)}
+          {field('Lier à un spot (optionnel)', (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <input
+                className="aef-input"
+                value={spotSearch}
+                onChange={e => setSpotSearch(e.target.value)}
+                placeholder="Rechercher un spot…"
+              />
+              {spotSearch.length >= 2 && (
+                <div className="aef-spot-results">
+                  {spots
+                    .filter(s => s.name.toLowerCase().includes(spotSearch.toLowerCase()))
+                    .slice(0, 5)
+                    .map(s => (
+                      <button key={s.id} className={`aef-spot-result${form.spot_id === String(s.id) ? ' selected' : ''}`}
+                        onClick={() => { set('spot_id', String(s.id)); if (!form.spot_name) set('spot_name', s.name); if (!form.quartier) set('quartier', s.quartier || ''); setSpotSearch(''); }}>
+                        <strong>{s.name}</strong>
+                        <span>{s.category}{s.quartier ? ` · ${s.quartier}` : ''}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+              {form.spot_id && (
+                <div className="aef-spot-linked">
+                  🔗 Spot lié : {spots.find(s => String(s.id) === form.spot_id)?.name || form.spot_id}
+                  <button onClick={() => set('spot_id', '')} style={{ marginLeft: 8, color: '#f87171' }}>✕</button>
+                </div>
+              )}
+            </div>
+          ))}
           {field('Quartier', <input className="aef-input" value={form.quartier} onChange={(e) => set('quartier', e.target.value)} placeholder="Capitole" />)}
           {field('Date *', <input className="aef-input" type="date" value={form.date} onChange={(e) => set('date', e.target.value)} />)}
 

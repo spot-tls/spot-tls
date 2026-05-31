@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense, useEffect } from 'react';
+﻿import { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import TopBar    from './components/Layout/TopBar';
 import BottomNav from './components/Layout/BottomNav';
 import HomeView  from './components/HomeView/HomeView';
@@ -195,7 +195,7 @@ export default function App() {
 
       {showEvents && (
         <Suspense fallback={null}>
-          <EventsView onClose={() => setShowEvents(false)} admin={admin} />
+          <EventsView onClose={() => setShowEvents(false)} admin={admin} spots={mergedSpots} />
         </Suspense>
       )}
 

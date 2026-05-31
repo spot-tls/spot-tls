@@ -97,3 +97,28 @@
   border: 1px solid var(--border); background: var(--bg-soft);
   color: var(--text); font-size: 14px; cursor: pointer;
 }
+
+/* Spot picker */
+.aef-spot-results {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.aef-spot-result {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 2px;
+  text-align: left;
+  padding: 9px 12px;
+  font-size: 13px; color: var(--text);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: background .12s ease;
+}
+.aef-spot-result:last-child { border-bottom: none; }
+.aef-spot-result span { font-size: 11px; color: var(--text-muted); }
+.aef-spot-result:hover, .aef-spot-result.selected { background: rgba(167,139,250,0.12); }
+.aef-spot-linked {
+  font-size: 12px; font-weight: 600;
+  color: var(--secondary);
+  display: flex; align-items: center; gap: 4px;
+}

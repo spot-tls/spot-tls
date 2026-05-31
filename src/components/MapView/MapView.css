@@ -720,3 +720,34 @@
   border-radius: 20px;
   border: 1.5px solid var(--border);
 }
+/* ── SpotDetail : section "Ce qui se passe ici" ─────────────────── */
+.sd-events-section {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.sd-events-title {
+  font-size: 13px; font-weight: 800;
+  color: var(--text); padding: 12px 14px 8px;
+  letter-spacing: -0.01em;
+}
+.sd-event-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.sd-event-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.sd-event-body { flex: 1; min-width: 0; }
+.sd-event-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sd-event-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.sd-event-price {
+  font-size: 11px; font-weight: 700; color: var(--text-dim);
+  background: var(--bg); border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 99px; flex-shrink: 0;
+}

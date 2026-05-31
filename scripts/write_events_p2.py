@@ -1,3 +1,8 @@
+import os
+root = r'C:\Users\basti\Google Drive\marketing\SPOT cabau lesavre\Mise en route\APP\spot-app-v2\src'
+
+# ── 4. EventsView.jsx ─────────────────────────────────────────────────────────
+events_view_jsx = """\
 import { createPortal } from 'react-dom';
 import { useState, useMemo } from 'react';
 import { useEvents } from '../../hooks/useEvents';
@@ -275,3 +280,7 @@ export default function EventsView({ onClose, admin, spots = [] }) {
     document.body
   );
 }
+"""
+with open(os.path.join(root, 'components', 'EventsView', 'EventsView.jsx'), 'w', encoding='utf-8') as f:
+    f.write(events_view_jsx)
+print(f"EventsView.jsx written ({len(events_view_jsx.splitlines())} lines)")

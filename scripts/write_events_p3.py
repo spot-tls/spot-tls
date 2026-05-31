@@ -1,3 +1,8 @@
+import os
+root = r'C:\Users\basti\Google Drive\marketing\SPOT cabau lesavre\Mise en route\APP\spot-app-v2\src'
+
+# ── 5. SpotDetail.jsx — avec section "Ce qui se passe ici" ───────────────────
+spot_detail_jsx = """\
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { deleteSpot } from '../../lib/supabaseAdmin';
@@ -109,12 +114,12 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
   const mapsUrl  = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.name + ' ' + (spot.address || ''))}`;
   const instaUrl = spot.insta ? (spot.insta.startsWith('http') ? spot.insta : `https://instagram.com/${spot.insta.replace(/^@/,'')}`) : null;
   const siteUrl  = spot.website || null;
-  const telUrl   = spot.phone ? `tel:${spot.phone.replace(/\s/g,'')}` : null;
+  const telUrl   = spot.phone ? `tel:${spot.phone.replace(/\\s/g,'')}` : null;
   const resaUrl  = spot.reservation_url || null;
 
   const share = async () => {
     const url  = `https://spot-tls.vercel.app/?spot=${spot.id}`;
-    const text = `${spot.name} — ${spot.category}${spot.quartier ? ' · ' + spot.quartier : ''}\n📍 Découvre ce spot sur SpotTLS`;
+    const text = `${spot.name} — ${spot.category}${spot.quartier ? ' · ' + spot.quartier : ''}\\n📍 Découvre ce spot sur SpotTLS`;
     if (navigator.share) {
       try { await navigator.share({ title: spot.name, text, url }); } catch {}
     } else {
@@ -313,3 +318,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
     document.body
   );
 }
+"""
+with open(os.path.join(root, 'components', 'MapView', 'SpotDetail.jsx'), 'w', encoding='utf-8') as f:
+    f.write(spot_detail_jsx)
+print(f"SpotDetail.jsx written ({len(spot_detail_jsx.splitlines())} lines)")

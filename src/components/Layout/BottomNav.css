@@ -8,10 +8,11 @@
   z-index: 50;
   display: flex;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: var(--glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
+  background: rgba(8,6,26,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -1px 0 rgba(240,81,159,0.1);
 }
 
 .bottomnav-tab {
@@ -48,19 +49,20 @@
   background: var(--gradient-brand);
 }
 
-.bottomnav-emoji {
+.bottomnav-icon {
   position: relative;
-  font-size: 22px;
-  line-height: 1;
-  transition: filter .15s ease, transform .15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, opacity .15s ease;
 }
 
-.bottomnav-tab.active .bottomnav-emoji {
+.bottomnav-tab.active .bottomnav-icon {
   transform: translateY(-1px);
 }
 
-.bottomnav-tab:not(.active) .bottomnav-emoji {
-  filter: grayscale(0.35) opacity(0.8);
+.bottomnav-tab:not(.active) .bottomnav-icon {
+  opacity: 0.5;
 }
 
 .bottomnav-badge {

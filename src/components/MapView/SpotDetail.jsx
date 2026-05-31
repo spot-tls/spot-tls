@@ -153,11 +153,11 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
             <Gallery photos={photos} name={spot.name} />
             <div className="sd-hero-fade" />
             <HeroActions />
-            {isCoup && <div className="sd-coup-badge">❤️ Coup de cœur</div>}
+            {isCoup && <div className="sd-coup-badge">Coup de cœur</div>}
             <div className="sd-hero-bottom">
               <h2 className="sd-hero-name">{spot.name}</h2>
               <div className="sd-hero-meta">
-                <span style={{ color: cat.color }}>{cat.emoji} {spot.category}</span>
+                <span style={{ color: cat.color }}>{spot.category}</span>
                 {spot.quartier && <><span className="sd-hero-dot" /><span>{spot.quartier}</span></>}
                 {open !== null && <span className="sd-hero-dot" />}
                 {open === true  && <span className="sd-status-open">● Ouvert</span>}
@@ -169,7 +169,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
           <div className="sd-hero sd-hero--gradient" style={{ background: cat.gradient }}>
             <div className="sd-hero-gradient-overlay" />
             <HeroActions />
-            {isCoup && <div className="sd-coup-badge">❤️ Coup de cœur</div>}
+            {isCoup && <div className="sd-coup-badge">Coup de cœur</div>}
             <div className="sd-hero-bottom">
               <div className="sd-hero-emoji">{cat.emoji}</div>
               <div>
@@ -189,7 +189,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
         {/* ── INFOS RAPIDES ── */}
         <div className="sd-quickinfo">
           {spot.google_rating && <div className="sd-qi-item"><StarRating value={spot.google_rating} /></div>}
-          {dist != null && <div className="sd-qi-item sd-qi-sep">📍 {formatDistance(dist)}</div>}
+          {dist != null && <div className="sd-qi-item sd-qi-sep">{formatDistance(dist)}</div>}
           {spot.price && <div className="sd-qi-item sd-qi-sep"><span className="sd-price">{spot.price}</span></div>}
           {open === null && <div className="sd-qi-item sd-qi-sep sd-qi-muted">Horaires à venir</div>}
         </div>
@@ -210,12 +210,12 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
 
         {/* ── ACTIONS PRINCIPALES ── */}
         <div className="sd-actions-row">
-          <a className="sd-action-primary" href={mapsUrl} target="_blank" rel="noreferrer">🧭 Itinéraire</a>
-          {resaUrl && <a className="sd-action-secondary" href={resaUrl} target="_blank" rel="noreferrer">📅 Réserver</a>}
-          <button className="sd-action-secondary" onClick={share}>{shared ? '✓ Copié' : '↗ Partager'}</button>
-          {telUrl   && <a className="sd-action-secondary" href={telUrl}>📞</a>}
-          {instaUrl && <a className="sd-action-secondary" href={instaUrl} target="_blank" rel="noreferrer">📸</a>}
-          {siteUrl  && <a className="sd-action-secondary" href={siteUrl}  target="_blank" rel="noreferrer">🌐</a>}
+          <a className="sd-action-primary" href={mapsUrl} target="_blank" rel="noreferrer">Itinéraire</a>
+          {resaUrl && <a className="sd-action-secondary" href={resaUrl} target="_blank" rel="noreferrer">Réserver</a>}
+          <button className="sd-action-secondary" onClick={share}>{shared ? '✓ Copié' : 'Partager'}</button>
+          {telUrl   && <a className="sd-action-secondary" href={telUrl}>Appeler</a>}
+          {instaUrl && <a className="sd-action-secondary" href={instaUrl} target="_blank" rel="noreferrer">Instagram</a>}
+          {siteUrl  && <a className="sd-action-secondary" href={siteUrl}  target="_blank" rel="noreferrer">Site web</a>}
         </div>
 
         {/* ── CORPS ── */}
@@ -247,14 +247,14 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
                 <div className="sd-resa-title">Disponibilités en ligne</div>
                 <div className="sd-resa-sub">TheFork, Shotgun ou site officiel</div>
               </div>
-              <span className="sd-resa-btn">📅 Réserver</span>
+              <span className="sd-resa-btn">Réserver</span>
             </a>
           )}
 
           {/* ── CE QUI SE PASSE ICI ── */}
           {spotEvents.length > 0 && (
             <div className="sd-events-section">
-              <div className="sd-events-title">🎫 Ce qui se passe ici</div>
+              <div className="sd-events-title">Ce qui se passe ici</div>
               {spotEvents.map(ev => {
                 const color = EV_CAT_COLOR[ev.category] || '#A78BFA';
                 const emoji = EV_CAT_EMOJI[ev.category] || '📅';
@@ -290,7 +290,7 @@ export default function SpotDetail({ spot, onClose, isFavorite, onToggleFavorite
             </div>
           )}
 
-          {spot.phone && <a className="sd-contact-row" href={telUrl}>📞 {spot.phone}</a>}
+          {spot.phone && <a className="sd-contact-row" href={telUrl}>{spot.phone}</a>}
         </div>
 
         {/* ── ADMIN ── */}

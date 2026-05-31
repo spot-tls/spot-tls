@@ -214,19 +214,19 @@
 .sd-overlay {
   position: fixed; inset: 0; z-index: 2000;
   display: flex; align-items: flex-end; justify-content: center;
-  background: rgba(7,6,12,0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(4,3,14,0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   animation: fade-in .2s ease;
 }
 .sd-sheet {
   width: 100%; max-width: 480px; max-height: 92%;
   overflow-y: auto;
-  background: var(--bg);
-  border: 1px solid rgba(167,139,250,0.18);
+  background: linear-gradient(180deg, #0F0A1E 0%, #08061A 100%);
+  border: 1px solid var(--glass-border);
   border-bottom: none;
   border-radius: 28px 28px 0 0;
-  box-shadow: 0 -24px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 -24px 60px rgba(0,0,0,0.7), 0 -1px 0 rgba(240,81,159,0.15);
   animation: sheet-up .3s cubic-bezier(.16,1,.3,1);
   scrollbar-width: none;
 }
@@ -249,7 +249,7 @@
   overflow: hidden;
   margin-top: 4px;
 }
-.sd-hero--photo { background: #1a1825; }
+.sd-hero--photo { background: #0A0614; }
 .sd-hero--gradient { }
 .sd-hero-gradient-overlay {
   position: absolute; inset: 0;
@@ -257,7 +257,7 @@
 }
 .sd-hero-fade {
   position: absolute; inset: 0;
-  background: linear-gradient(to bottom, transparent 35%, rgba(16,14,28,0.88) 100%);
+  background: linear-gradient(to bottom, transparent 25%, rgba(8,6,26,0.92) 100%);
   pointer-events: none;
 }
 .sd-hero-bottom {
@@ -362,16 +362,20 @@
 .sd-reaction {
   display: flex; align-items: center; gap: 5px;
   padding: 7px 13px; border-radius: 20px;
-  border: 1.5px solid var(--border);
-  background: var(--bg-elevated);
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   font-size: 18px;
   transition: all .15s;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .sd-reaction.active {
   border-color: var(--primary);
-  background: rgba(236,72,153,0.12);
+  background: rgba(240,81,159,0.15);
   transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(240,81,159,0.25), inset 0 1px 0 rgba(255,255,255,0.07);
 }
 .sd-reaction-count { font-size: 13px; font-weight: 700; color: var(--text-dim); }
 
@@ -395,13 +399,17 @@
   flex: 1; min-width: 80px;
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
   padding: 12px 14px; border-radius: var(--radius-pill);
-  background: var(--bg-elevated);
-  border: 1.5px solid var(--border);
-  color: var(--text-dim); font-size: 13px; font-weight: 700;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1.5px solid var(--glass-border);
+  color: var(--text-dim); font-size: 13px; font-weight: 600;
   text-decoration: none; cursor: pointer;
-  transition: background .15s, transform .15s;
+  transition: background .15s, transform .15s, border-color .15s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
-.sd-action-secondary:active { background: var(--bg-card); transform: scale(0.97); }
+.sd-action-secondary:hover { background: rgba(139,92,246,0.15); border-color: rgba(167,139,250,0.4); color: var(--text); }
+.sd-action-secondary:active { transform: scale(0.97); }
 
 /* ── Corps ── */
 .sd-body { padding: 4px 16px 32px; display: flex; flex-direction: column; gap: 14px; }
@@ -409,10 +417,14 @@
   display: flex; align-items: flex-start; gap: 6px;
   font-size: 13px; color: var(--text-muted); text-decoration: none;
   padding: 10px 14px; border-radius: 12px;
-  background: var(--bg-elevated); border: 1px solid var(--border);
-  transition: color .15s;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  transition: color .15s, background .15s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.sd-address:hover { color: var(--text); }
+.sd-address:hover { color: var(--text); background: rgba(139,92,246,0.12); }
 .sd-desc {
   font-size: 14px; line-height: 1.65; color: var(--text-dim);
   padding: 2px 0;
@@ -451,8 +463,12 @@
 
 /* Horaires */
 .sd-hours {
-  background: var(--bg-elevated); border: 1px solid var(--border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 14px; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .sd-hours-title {
   font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
@@ -471,7 +487,10 @@
   display: flex; align-items: center; gap: 8px;
   font-size: 13px; color: var(--text-dim); text-decoration: none;
   padding: 10px 14px; border-radius: 12px;
-  background: var(--bg-elevated); border: 1px solid var(--border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
 }
 
 /* ── Admin ── */

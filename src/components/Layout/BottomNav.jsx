@@ -1,11 +1,12 @@
+import { Home, Map, Heart, Search, Martini } from 'lucide-react';
 import './BottomNav.css';
 
 const TABS = [
-  { key: 'home',   label: 'Accueil',   emoji: '🏠' },
-  { key: 'map',    label: 'Carte',     emoji: '🗺️' },
-  { key: 'favs',   label: 'Favoris',   emoji: '❤️' },
-  { key: 'search', label: 'Recherche', emoji: '🔍' },
-  { key: 'social', label: 'Soirée',    emoji: '🍸' },
+  { key: 'home',   label: 'Accueil',   Icon: Home },
+  { key: 'map',    label: 'Carte',     Icon: Map },
+  { key: 'favs',   label: 'Favoris',   Icon: Heart },
+  { key: 'search', label: 'Recherche', Icon: Search },
+  { key: 'social', label: 'Soirée',    Icon: Martini },
 ];
 
 export default function BottomNav({ activePage, onChange, favCount = 0 }) {
@@ -19,8 +20,8 @@ export default function BottomNav({ activePage, onChange, favCount = 0 }) {
             className={"bottomnav-tab" + (active ? ' active' : '')}
             onClick={() => onChange(tab.key)}
           >
-            <span className="bottomnav-emoji">
-              {tab.emoji}
+            <span className="bottomnav-icon">
+              <tab.Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
               {tab.key === 'favs' && favCount > 0 && (
                 <span className="bottomnav-badge">{favCount}</span>
               )}

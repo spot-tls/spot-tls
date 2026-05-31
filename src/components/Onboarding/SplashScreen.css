@@ -52,9 +52,15 @@
   0%   { opacity: 0; transform: scale(0.5) translateY(10px); }
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
+.splash-logo-img {
+  width: 96px; height: 96px;
+  border-radius: 24px;
+  object-fit: contain;
+  box-shadow: 0 0 32px #EC489960, 0 0 60px #A78BFA30;
+}
 .splash-logo-ring {
   position: absolute; inset: -10px;
-  border-radius: 50%;
+  border-radius: 32px;
   border: 1.5px solid #EC489950;
   animation: ringPulse 2.4s ease-in-out infinite;
 }

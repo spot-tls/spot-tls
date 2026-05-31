@@ -11,6 +11,8 @@ import { useSpotEdits }  from './hooks/useSpotEdits';
 import { useAdminMode }  from './hooks/useAdminMode';
 import { useNewSpots }   from './hooks/useNewSpots';
 import { useAuth }       from './hooks/useAuth';
+import { useEvents }     from './hooks/useEvents';
+import EventDetail       from './components/EventDetail/EventDetail';
 
 // Vues lazy-loadées — chargées seulement à la première visite
 const MapView        = lazy(() => import('./components/MapView/MapView'));
@@ -24,20 +26,22 @@ const ShareLanding   = lazy(() => import('./components/ShareLanding/ShareLanding
 const AuthModal      = lazy(() => import('./components/Auth/AuthModal'));
 const SettingsDrawer = lazy(() => import('./components/Settings/SettingsDrawer'));
 
-const SHARE_SPOT_ID   = new URLSearchParams(window.location.search).get('spot');
+const SHARE_SPOT_ID    = new URLSearchParams(window.location.search).get('spot');
+const SHARE_EVENT_ID   = new URLSearchParams(window.location.search).get('event');
 const IS_AUTH_CALLBACK = window.location.hash.includes('access_token') || window.location.hash.includes('error=');
 
 export default function App() {
   const [activePage,     setActivePage]     = useState('home');
   const [showBeta,       setShowBeta]       = useState(false);
   const [showSplash,     setShowSplash]     = useState(() => {
-    if (SHARE_SPOT_ID || IS_AUTH_CALLBACK) return false;
+    if (SHARE_SPOT_ID || SHARE_EVENT_ID || IS_AUTH_CALLBACK) return false;
     return !localStorage.getItem('spottls_splash_seen');
   });
   const [showEvents,     setShowEvents]     = useState(false);
   const [showAuth,       setShowAuth]       = useState(false);
   const [showSettings,   setShowSettings]   = useState(false);
   const [shareDismissed, setShareDismissed] = useState(false);
+  const [deepLinkEvent,  setDeepLinkEvent]  = useState(null);
   // MapView est monté en différé : évite de charger MapLibre (~800 KB) au démarrage
   const [mapEverActive,  setMapEverActive]  = useState(false);
 
@@ -51,6 +55,18 @@ export default function App() {
   };
 
   const { spots, loading, error, removeSpot, moveSpot }      = useSpots();
+  const { allEvents }                                        = useEvents();
+
+  // Deep link ?event=ID — ouvre EventDetail dès que les events sont chargés
+  useEffect(() => {
+    if (!SHARE_EVENT_ID || !allEvents?.length) return;
+    const ev = allEvents.find(e => String(e.id) === SHARE_EVENT_ID);
+    if (ev) {
+      setDeepLinkEvent(ev);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [allEvents]);
+
   const [repositioningSpot, setRepositioningSpot]            = useState(null);
   const { favoriteIds, isFavorite, toggleFavorite, count }   = useFavorites();
   const { position: userPos, status: geoStatus, locate }     = useGeolocation();
@@ -247,6 +263,15 @@ export default function App() {
             }}
           />
         </Suspense>
+      )}
+
+      {deepLinkEvent && (
+        <EventDetail
+          event={deepLinkEvent}
+          onClose={() => setDeepLinkEvent(null)}
+          spots={mergedSpots}
+          onOpenSpot={() => { setDeepLinkEvent(null); setActivePage('map'); }}
+        />
       )}
     </div>
   );

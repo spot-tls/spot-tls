@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
-import { Bookmark, Ticket, MapPin, Clock, Share2, Star } from 'lucide-react';
+import { Bookmark, Ticket, MapPin, Clock, Share2, Music2 } from 'lucide-react';
 import { useEventBookmarks } from '../../hooks/useEventBookmarks';
 import './EventDetail.css';
 
@@ -38,12 +38,13 @@ export default function EventDetail({ event, onClose, onOpenSpot, spots = [] }) 
     : { background: `linear-gradient(160deg,#1a1035,#2d1052,${cat.color}55)` };
 
   const handleShare = async () => {
-    const url  = window.location.href;
-    const text = `${event.title} — ${event.category}\n${event.spot_name ? '@ ' + event.spot_name : ''}`;
+    const base = `${window.location.origin}${window.location.pathname}`;
+    const url  = `${base}?event=${event.id}`;
+    const text = `${event.title} — ${event.category}${event.spot_name ? '\n@ ' + event.spot_name : ''}${event.date ? '\n' + formatDate(event.date) : ''}`;
     if (navigator.share) {
       try { await navigator.share({ title: event.title, text, url }); } catch {}
     } else {
-      try { await navigator.clipboard.writeText(url); setShared(true); setTimeout(() => setShared(false), 2000); } catch {}
+      try { await navigator.clipboard.writeText(url); setShared(true); setTimeout(() => setShared(false), 2500); } catch {}
     }
   };
 
@@ -98,6 +99,24 @@ export default function EventDetail({ event, onClose, onOpenSpot, spots = [] }) 
           {(event.price_detail || event.price) && (
             <div className="ed-price-row">
               <span className="ed-price-pill">{event.price_detail || event.price}</span>
+            </div>
+          )}
+
+          {/* Line-up */}
+          {event.lineup?.length > 0 && (
+            <div className="ed-lineup">
+              <div className="ed-lineup-header">
+                <Music2 size={13} strokeWidth={2} style={{ opacity: 0.6 }} />
+                <span>Line-up</span>
+              </div>
+              <div className="ed-lineup-list">
+                {event.lineup.map((artist, i) => (
+                  <div key={i} className="ed-lineup-artist">
+                    <span className="ed-lineup-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="ed-lineup-name">{artist}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

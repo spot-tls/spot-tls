@@ -33,6 +33,7 @@ export default function AdminEventForm({ event, onClose, onSaved, onDeleted, spo
     description:  event?.description  || '',
     link:         event?.link         || '',
     featured:     event?.featured     || false,
+    lineup:       Array.isArray(event?.lineup) ? event.lineup.join('\n') : (event?.lineup || ''),
   });
   const [spotSearch, setSpotSearch] = useState('');
 
@@ -48,7 +49,10 @@ export default function AdminEventForm({ event, onClose, onSaved, onDeleted, spo
     if (!form.date)          { setError('La date est requise.');  return; }
     setSaving(true); setError('');
     try {
-      const payload = { ...form, featured: !!form.featured };
+      const lineupArr = form.lineup
+        ? form.lineup.split('\n').map(s => s.trim()).filter(Boolean)
+        : [];
+      const payload = { ...form, featured: !!form.featured, lineup: lineupArr };
       if (isEdit) {
         await updateEvent(event.id, payload);
       } else {
@@ -138,6 +142,7 @@ export default function AdminEventForm({ event, onClose, onSaved, onDeleted, spo
           {field('Détail prix', <input className="aef-input" value={form.price_detail} onChange={(e) => set('price_detail', e.target.value)} placeholder="12€ / gratuit avant 23h30" />)}
           {field('Photo URL', <input className="aef-input" value={form.photo_url} onChange={(e) => set('photo_url', e.target.value)} placeholder="https://..." />)}
           {field('Description', <textarea className="aef-input aef-textarea" value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Description de l'événement..." rows={3} />)}
+          {field('Line-up (un artiste par ligne)', <textarea className="aef-input aef-textarea" value={form.lineup} onChange={(e) => set('lineup', e.target.value)} placeholder={"DJ Snake\nCaroline Polachek\nSobek b2b Varg"} rows={4} />)}
           {field('Lien / réservation', <input className="aef-input" value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="https://..." />)}
 
           <label className="aef-check-row">

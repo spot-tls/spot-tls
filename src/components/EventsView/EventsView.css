@@ -3,22 +3,25 @@
 .ev3-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(4,3,14,0.75);
   z-index: 200;
   display: flex;
   align-items: flex-end;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .ev3-panel {
   width: 100%;
   max-height: 92dvh;
-  background: var(--bg);
+  background: linear-gradient(180deg, #0F0A1E 0%, #08061A 100%);
   border-radius: 28px 28px 0 0;
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 -8px 48px rgba(0,0,0,0.5);
+  box-shadow: 0 -24px 60px rgba(0,0,0,0.7), 0 -1px 0 rgba(240,81,159,0.15);
 }
 
 .ev3-handle {
@@ -52,13 +55,17 @@
 .ev3-close {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   font-size: 20px;
   color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  transition: background .15s, color .15s;
 }
+.ev3-close:hover { background: rgba(139,92,246,0.18); color: var(--text); }
 
 /* Filters row */
 .ev3-filters-row {
@@ -82,33 +89,41 @@
   padding: 8px 16px;
   border-radius: 99px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   transition: all .15s ease;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .ev3-time-pill.active {
-  background: rgba(236,72,153,0.15);
-  border-color: rgba(236,72,153,0.55);
-  color: #EC4899;
+  background: rgba(240,81,159,0.18);
+  border-color: rgba(240,81,159,0.55);
+  color: var(--primary);
+  box-shadow: 0 0 14px rgba(240,81,159,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .ev3-filter-icon {
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  font-size: 16px;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  transition: border-color .15s;
+  transition: border-color .15s, background .15s, color .15s;
   cursor: pointer;
 }
+.ev3-filter-icon:hover { color: var(--text); }
 .ev3-filter-icon.has-filter {
-  border-color: rgba(236,72,153,0.6);
-  background: rgba(236,72,153,0.12);
+  border-color: rgba(240,81,159,0.6);
+  background: rgba(240,81,159,0.12);
+  color: var(--primary);
 }
 
 /* Week strip */
@@ -131,14 +146,18 @@
   gap: 3px;
   padding: 8px 4px;
   border-radius: 14px;
-  background: var(--bg-elevated);
-  border: 1px solid transparent;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   transition: all .15s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.ev3-day-btn.today .ev3-day-label { color: #EC4899; }
+.ev3-day-btn.today .ev3-day-label { color: var(--primary); }
 .ev3-day-btn.active {
-  background: rgba(236,72,153,0.12);
-  border-color: rgba(236,72,153,0.4);
+  background: rgba(240,81,159,0.18);
+  border-color: rgba(240,81,159,0.5);
+  box-shadow: 0 0 12px rgba(240,81,159,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 .ev3-day-label {
   font-size: 10px;
@@ -194,7 +213,7 @@
 .ev3-featured-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%);
+  background: linear-gradient(to top, rgba(8,6,26,0.96) 0%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.0) 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -207,11 +226,14 @@
 }
 .ev3-badge-star {
   font-size: 11px;
-  background: rgba(236,72,153,0.9);
+  background: var(--gradient-brand-intense);
   color: #fff;
   padding: 4px 12px;
   border-radius: 99px;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(240,81,159,0.4);
 }
 .ev3-featured-body {
   display: flex;
@@ -366,12 +388,15 @@
 }
 .ev3-cat-drawer {
   width: 100%;
-  background: var(--bg-elevated);
+  background: linear-gradient(180deg, #110D22 0%, #08061A 100%);
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
   border-radius: 24px 24px 0 0;
   padding: 8px 20px 36px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  box-shadow: 0 -16px 40px rgba(0,0,0,0.6);
 }
 .ev3-cat-drawer-handle {
   width: 36px; height: 4px;
@@ -397,11 +422,15 @@
   gap: 6px;
   padding: 14px 8px;
   border-radius: 16px;
-  background: var(--bg-card, var(--bg));
-  border: 1px solid var(--border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   transition: all .15s;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
+.ev3-cat-drawer-btn:hover { background: rgba(139,92,246,0.18); border-color: rgba(167,139,250,0.4); }
 .ev3-cat-drawer-emoji { font-size: 22px; }
 .ev3-cat-drawer-label {
   font-size: 11px;
@@ -409,16 +438,70 @@
   color: var(--text-muted);
 }
 
+/* Bookmark button sur les cards */
+.ev3-bookmark-btn {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .15s ease;
+}
+.ev3-bookmark-btn.active {
+  background: rgba(167,139,250,0.55);
+  border-color: rgba(167,139,250,0.7);
+  color: #fff;
+}
+.ev3-bookmark-btn:hover { background: rgba(167,139,250,0.4); }
+
+/* Bouton "Sauvegardés" dans le header */
+.ev3-saved-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: all .15s ease;
+}
+.ev3-saved-btn.active {
+  background: rgba(167,139,250,0.2);
+  border-color: rgba(167,139,250,0.55);
+  color: var(--secondary);
+}
+.ev3-saved-btn.has-bookmarks { color: var(--secondary); }
+.ev3-saved-count {
+  position: absolute; top: -3px; right: -3px;
+  min-width: 15px; height: 15px;
+  background: var(--primary);
+  color: #fff; font-size: 9px; font-weight: 700;
+  border-radius: 99px; padding: 0 3px;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+
 /* Admin */
 .ev3-admin-add {
   width: 34px; height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  font-size: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-muted);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
 }
+.ev3-admin-add:hover { background: rgba(240,81,159,0.18); color: var(--primary); }
 .ev3-edit-btn {
   position: absolute;
   top: 8px; right: 8px;

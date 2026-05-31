@@ -1,6 +1,8 @@
 import { createPortal } from 'react-dom';
 import { useState, useMemo } from 'react';
+import { SlidersHorizontal, Plus, Bookmark } from 'lucide-react';
 import { useEvents } from '../../hooks/useEvents';
+import { useEventBookmarks } from '../../hooks/useEventBookmarks';
 import AdminEventForm from '../AdminEventForm/AdminEventForm';
 import EventDetail from '../EventDetail/EventDetail';
 import './EventsView.css';
@@ -49,16 +51,16 @@ function FeaturedCard({ event, spots, onClick }) {
     <button className="ev3-featured" style={{ background: bg }} onClick={onClick}>
       <div className="ev3-featured-overlay">
         <div className="ev3-featured-top">
-          <span className="ev3-badge-cat" style={{ background: cat.color + '33', color: cat.color, borderColor: cat.color + '55' }}>
-            {cat.emoji} {event.category}
+          <span className="ev3-badge-cat" style={{ background: cat.color + '28', color: cat.color, borderColor: cat.color + '50' }}>
+            {event.category}
           </span>
-          <span className="ev3-badge-star">✨ À la une</span>
+          <span className="ev3-badge-star">À la une</span>
         </div>
         <div className="ev3-featured-body">
           <div className="ev3-featured-title">{event.title}</div>
           <div className="ev3-featured-row">
             <span className="ev3-badge-time">{event.time_start}</span>
-            <span className="ev3-featured-venue">📍 {event.spot_name || event.venue}</span>
+            <span className="ev3-featured-venue">{event.spot_name || event.venue}</span>
           </div>
           {event.price_detail && <span className="ev3-badge-price">{event.price_detail}</span>}
         </div>
@@ -67,7 +69,7 @@ function FeaturedCard({ event, spots, onClick }) {
   );
 }
 
-function EventCard({ event, onClick }) {
+function EventCard({ event, onClick, onBookmark, bookmarked }) {
   const cat = getCat(event.category);
   const bg = event.photo_url
     ? `url(${event.photo_url}) center/cover no-repeat`
@@ -76,14 +78,22 @@ function EventCard({ event, onClick }) {
     <button className="ev3-card" style={{ background: bg }} onClick={onClick}>
       <div className="ev3-card-overlay">
         <div className="ev3-card-top">
-          <span className="ev3-badge-cat small" style={{ background: cat.color + '33', color: cat.color, borderColor: cat.color + '55' }}>
-            {cat.emoji} {event.category}
+          <span className="ev3-badge-cat small" style={{ background: cat.color + '28', color: cat.color, borderColor: cat.color + '50' }}>
+            {event.category}
           </span>
-          <span className="ev3-badge-time small">{event.time_start}</span>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <span className="ev3-badge-time small">{event.time_start}</span>
+            <button
+              className={`ev3-bookmark-btn${bookmarked ? ' active' : ''}`}
+              onClick={e => { e.stopPropagation(); onBookmark(event.id); }}
+            >
+              <Bookmark size={13} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
+            </button>
+          </div>
         </div>
         <div className="ev3-card-body">
           <div className="ev3-card-title">{event.title}</div>
-          <div className="ev3-card-venue">📍 {event.spot_name || event.venue}{event.quartier ? ` · ${event.quartier}` : ''}</div>
+          <div className="ev3-card-venue">{event.spot_name || event.venue}{event.quartier ? ` · ${event.quartier}` : ''}</div>
         </div>
       </div>
     </button>
@@ -141,11 +151,13 @@ export default function EventsView({ onClose, admin, spots = [] }) {
     events, allEvents, weekDays, activeDay, setActiveDay,
     activeCategory, setActiveCategory, categories, hasDayEvents,
   } = useEvents();
+  const { ids: bookmarkIds, toggle: toggleBookmark, isBookmarked } = useEventBookmarks();
 
   const [editingEvent,  setEditingEvent]  = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [timeFilter,    setTimeFilter]    = useState('tonight');
   const [showCatDrawer, setShowCatDrawer] = useState(false);
+  const [showSaved,     setShowSaved]     = useState(false);
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
@@ -171,7 +183,14 @@ export default function EventsView({ onClose, admin, spots = [] }) {
             <div className="ev3-sub">La nuit en direct</div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {admin && <button className="ev3-admin-add" onClick={() => setEditingEvent({})}>➕</button>}
+            <button
+              className={`ev3-saved-btn${showSaved ? ' active' : ''}${bookmarkIds.length > 0 ? ' has-bookmarks' : ''}`}
+              onClick={() => setShowSaved(v => !v)}
+            >
+              <Bookmark size={15} strokeWidth={2} fill={showSaved ? 'currentColor' : 'none'} />
+              {bookmarkIds.length > 0 && <span className="ev3-saved-count">{bookmarkIds.length}</span>}
+            </button>
+            {admin && <button className="ev3-admin-add" onClick={() => setEditingEvent({})}><Plus size={16} strokeWidth={2} /></button>}
             <button className="ev3-close" onClick={onClose}>×</button>
           </div>
         </div>
@@ -192,7 +211,7 @@ export default function EventsView({ onClose, admin, spots = [] }) {
             className={`ev3-filter-icon${activeCategory !== 'all' ? ' has-filter' : ''}`}
             onClick={() => setShowCatDrawer(true)}
           >
-            🎛️
+            <SlidersHorizontal size={16} strokeWidth={2} />
           </button>
         </div>
 
@@ -219,7 +238,24 @@ export default function EventsView({ onClose, admin, spots = [] }) {
         )}
 
         <div className="ev3-body">
-          {displayEvents.length === 0 ? (
+          {showSaved ? (
+            bookmarkIds.length === 0 ? (
+              <div className="ev3-empty">
+                <div className="ev3-empty-icon">🔖</div>
+                <div className="ev3-empty-text">Aucun événement sauvegardé</div>
+                <div className="ev3-empty-sub">Appuie sur le marque-page d'un event pour le retrouver ici</div>
+              </div>
+            ) : (
+              <>
+                <div className="ev3-section-header">{bookmarkIds.length} sauvegardé{bookmarkIds.length > 1 ? 's' : ''}</div>
+                {allEvents.filter(e => bookmarkIds.includes(e.id)).map(e => (
+                  <div key={e.id} style={{ position: 'relative' }}>
+                    <EventCard event={e} onClick={() => setSelectedEvent(e)} onBookmark={toggleBookmark} bookmarked={true} />
+                  </div>
+                ))}
+              </>
+            )
+          ) : displayEvents.length === 0 ? (
             <div className="ev3-empty">
               <div className="ev3-empty-icon">🌙</div>
               <div className="ev3-empty-text">
@@ -243,7 +279,7 @@ export default function EventsView({ onClose, admin, spots = [] }) {
               )}
               {others.map(e => (
                 <div key={e.id} style={{ position: 'relative' }}>
-                  <EventCard event={e} spots={spots} onClick={() => setSelectedEvent(e)} />
+                  <EventCard event={e} spots={spots} onClick={() => setSelectedEvent(e)} onBookmark={toggleBookmark} bookmarked={isBookmarked(e.id)} />
                   {admin && <button className="ev3-edit-btn" onClick={ev => { ev.stopPropagation(); setEditingEvent(e); }}>✏️</button>}
                 </div>
               ))}

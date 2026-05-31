@@ -72,6 +72,7 @@ export default function MapView({
   spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onEditSpot,
   admin, onAddSpot, onDeleteSpot,
   repositioningSpot, onStartReposition, onRepositionSave, onRepositionCancel,
+  isActive,
 }) {
   const mapEl   = useRef(null);
   const mapRef  = useRef(null);
@@ -349,6 +350,11 @@ export default function MapView({
   useEffect(() => {
     if (viewMode === 'map') setTimeout(() => mapRef.current?.resize(), 60);
   }, [viewMode]);
+
+  // Resize quand la page devient active depuis App.jsx (display:none → block)
+  useEffect(() => {
+    if (isActive) setTimeout(() => mapRef.current?.resize(), 120);
+  }, [isActive]);
 
   // ── Marqueur utilisateur ──
   useEffect(() => {

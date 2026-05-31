@@ -36,6 +36,7 @@ export default function App() {
   const [showAuth,        setShowAuth]        = useState(false);
   const [showSettings,    setShowSettings]    = useState(false);
   const [shareDismissed,  setShareDismissed]  = useState(false);
+
   const dismissSplash = () => {
     localStorage.setItem('spottls_splash_seen', '1');
     setShowSplash(false);
@@ -58,7 +59,6 @@ export default function App() {
   }, [spots, edits, newSpots]);
 
   const goMap  = () => setActivePage('map');
-
   const handleRequireAuth = () => setShowAuth(true);
 
   const centerScreen = (children) => (
@@ -105,6 +105,7 @@ export default function App() {
 
           <div style={{ display: activePage === 'map' ? 'block' : 'none' }}>
             <MapView
+              isActive={activePage === 'map'}
               spots={mergedSpots}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
@@ -118,10 +119,10 @@ export default function App() {
               repositioningSpot={repositioningSpot}
               onStartReposition={(spot) => { setRepositioningSpot(spot); setActivePage('map'); }}
               onRepositionSave={async (lat, lng) => {
-                  try { await updateSpotCoords(repositioningSpot.id, lat, lng); } catch (e) { console.error('Reposition error:', e); }
-                  moveSpot(repositioningSpot.id, lat, lng);
-                  setRepositioningSpot(null);
-                }}
+                try { await updateSpotCoords(repositioningSpot.id, lat, lng); } catch (e) { console.error('Reposition error:', e); }
+                moveSpot(repositioningSpot.id, lat, lng);
+                setRepositioningSpot(null);
+              }}
               onRepositionCancel={() => setRepositioningSpot(null)}
             />
           </div>
@@ -159,9 +160,7 @@ export default function App() {
               spots={mergedSpots}
               userPos={userPos}
               onRequireAuth={handleRequireAuth}
-              onOpenSpot={(spot) => {
-                setActivePage('map');
-              }}
+              onOpenSpot={() => setActivePage('map')}
             />
           )}
         </>
@@ -169,7 +168,6 @@ export default function App() {
 
       <BottomNav activePage={activePage} onChange={setActivePage} favCount={count} />
 
-      {/* Modals */}
       {showBeta     && <BetaModal onClose={() => setShowBeta(false)} />}
       {showEvents   && <EventsView onClose={() => setShowEvents(false)} admin={admin} />}
 
@@ -203,6 +201,7 @@ export default function App() {
       {showSplash && (
         <SplashScreen onDismiss={dismissSplash} onJoinBeta={() => setShowBeta(true)} />
       )}
+
       {SHARE_SPOT_ID && !shareDismissed && (
         <ShareLanding
           spot={mergedSpots.find((s) => String(s.id) === SHARE_SPOT_ID) || null}

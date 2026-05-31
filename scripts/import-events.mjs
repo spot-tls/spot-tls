@@ -10,8 +10,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync }  from 'fs';
 
-const SUPABASE_URL = 'https://nnxuewtauidiwrvxjbtr.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ueHVld3RhdWlkaXdydnhqYnRyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk1NzU2NCwiZXhwIjoyMDk1NTMzNTY0fQ.AJOaH27t9WHab6OILnHf-wUklLN5KHQux7erMhQSoRM';
+// Clés lues depuis .env.local (jamais hardcodées dans le repo)
+function loadEnv() {
+  const env = {};
+  for (const line of readFileSync(new URL('../.env.local', import.meta.url), 'utf8').split('\n')) {
+    const t = line.trim();
+    if (t && !t.startsWith('#') && t.includes('=')) {
+      const i = t.indexOf('=');
+      env[t.slice(0, i).trim()] = t.slice(i + 1).trim();
+    }
+  }
+  return env;
+}
+const ENV = loadEnv();
+
+const SUPABASE_URL = ENV.VITE_SUPABASE_URL;
+const SUPABASE_KEY = ENV.SUPABASE_SERVICE_KEY;
 const DRY_RUN      = process.argv.includes('--dry-run');
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);

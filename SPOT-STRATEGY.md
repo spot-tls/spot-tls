@@ -20,7 +20,7 @@ App de découverte de la vie nocturne toulousaine.
 
 ## Différenciateurs vs Google Maps / Shotgun
 
-1. **Ambiance en temps réel** — check-ins + humeur du moment (quand la masse critique est atteinte)
+1. **Ambiance en temps réel** — check-ins + humeur du moment (quand masse critique atteinte)
 2. **Communauté locale** — avis de vrais Toulousains, pas touristes anonymes
 3. **Events exclusifs** — partenariats avec bars pour annoncer en avant-première
 4. **Curation humaine** — sélections faites par quelqu'un qui connaît vraiment la scène
@@ -35,15 +35,6 @@ App de découverte de la vie nocturne toulousaine.
 - Le Florida — 💥 Bondé · 23 check-ins
 
 Alimenté par les check-ins déjà dans l'app. Google Maps ne peut jamais faire ça.
-
----
-
-## Feature à coder : Line-up DJ/Artists
-
-Pour les soirées électro (Interférence, Le Bikini, Arena), afficher les DJs dans les events.
-- Champ "line_up" dans le formulaire admin EventForm
-- Affiché dans EventDetail
-- Killer feature pour la scène techno toulousaine
 
 ---
 
@@ -79,13 +70,12 @@ Placement : comptoir des bars, toilettes des clubs
 
 Budget estimé :
 - 10-15 boîtes craft (Amazon) → ~25€
-- Contenu (chewing gum, etc.) → ~35€
+- Contenu → ~35€
 - Stickers + QR codes (Canva + imprimeur local) → ~30€
 
-**Comment entrer dans un bar :**
-_"Je développe une app de découverte de la scène Toulouse, on couvre déjà Le Bikini et l'Interférence. J'aimerais poser cette boîte au bar ce soir — les gens scannent le QR code et trouvent les prochaines dates."_
+Pitch bar : "Je développe une app de découverte de la scène Toulouse, on couvre déjà Le Bikini et l'Interférence. J'aimerais poser cette boîte au bar ce soir."
 
-**Avantage boîte :** prétexte pour revenir toutes les 2-3 semaines recharger → relation gérant → futur Spot Pro.
+La boîte = prétexte pour revenir toutes les 2-3 semaines recharger → relation gérant → futur Spot Pro.
 
 ### Autres idées marketing
 - Autocollants "Spot Validé" + QR code
@@ -97,7 +87,7 @@ _"Je développe une app de découverte de la scène Toulouse, on couvre déjà L
 ## Résoudre le problème poulet/oeuf
 
 ### Phase 1 — Muriel EST le contenu (mois 1-2)
-- Events ajoutés manuellement via admin form
+- Events ajoutés manuellement via admin form (formulaire déjà dans l'app)
 - Check-ins amorcés par toi
 - Descriptions de spots rédigées par toi
 - Curation 100% humaine : "Spot de la semaine"
@@ -123,24 +113,76 @@ _"Je développe une app de découverte de la scène Toulouse, on couvre déjà L
 
 ---
 
-## Features dev — Priorités
-
-### À faire maintenant
-- [ ] Line-up DJ dans les events (formulaire admin + EventDetail)
-
-### Moyen terme
-- [ ] "Ambiance en temps réel" (compteur check-ins visible sur la home)
-- [ ] Notifications "ton spot favori a un event ce soir"
-- [ ] Page stats pour les bars (vues, check-ins) → Spot Pro
-
-### Plus tard
-- [ ] Scraping RA.co pour les events automatiques
-- [ ] Spot Boost en self-service (le bar paie en ligne)
-- [ ] Line-up avec pages artistes
-
----
-
 ## Associé
 
 Situation : 3 semaines de "je commence demain". Avancer seul en attendant.
 Tâches à lui déléguer (non-critiques) : contenu réseaux, recherche partenariats, démarchage bars.
+
+---
+
+## État du code — Ce qui a été fait (session Mai 2026)
+
+### Design premium glassmorphism — TOUT FAIT ✅
+- `src/styles/theme.css` — tokens : `--bg: #08061A`, `--glass-card`, `--glass-border`, `--gradient-brand-intense`, `--font-title: 'Clash Display'`
+- `src/components/HomeView/HomeView.css/.jsx` — SpotCards, NearbyCards, Mood chips, Hero glows, zéro emoji
+- `src/components/Layout/BottomNav.jsx/.css` — Lucide icons (Home, Map, Heart, Search, Wine)
+- `src/components/Layout/TopBar.jsx/.css` — Lucide icons, logo `public/logo.svg` (texte "spot" gradient rose→violet)
+- `src/components/MapView/MapView.css` — SpotDetail glassmorphism
+- `src/components/MapView/SpotDetail.jsx` — zéro emoji sur les boutons
+- `src/components/EventsView/EventsView.jsx/.css` — glassmorphism, bookmarks (Bookmark icon), Lucide SlidersHorizontal
+- `src/components/EventDetail/EventDetail.jsx/.css` — Share (Share2), Bookmark, Ticket Lucide, deep link ?event=ID, lineup display
+- `src/components/AdminEventForm/AdminEventForm.jsx` — champ lineup (textarea, 1 artiste/ligne → array)
+- `src/components/SearchView/SearchView.css/.jsx` — topbar glass blur, titre gradient, mood chips glass, spot slides glass, Lucide Search/X
+- `src/components/SocialView/SocialView.css/.jsx` — header glass card, review cards glass, boutons Lucide (MapPin, PenLine, MessageCircle, RefreshCw)
+- `src/components/FavoritesView/FavoritesView.css` — hero card glass + titre gradient, sort pills glass, empty ring neon glow
+
+### Features ajoutées — FAIT
+- **Bookmarks events** — `useEventBookmarks` hook localStorage, toggle sur chaque card EventsView
+- **Deep link ?event=ID** — App.jsx détecte le param, ouvre EventDetail automatiquement
+- **Partage event** — URL générée `spot-tls.vercel.app?event=<id>` avec navigator.share
+- **Line-up DJs** — champ `lineup TEXT[]` dans AdminEventForm + section affichage dans EventDetail
+- **EventDetail depuis HomeView** — clic sur featured event → ouvre EventDetail directement
+
+### Bugs fixés — FAIT
+- **SpotCards iOS scroll** — `touch-action: pan-x` + `overflow-y: visible` sur `.hv-scroll-row` et `.hv-nearby-row`
+- **Logo TopBar** — `public/logo.svg` texte "spot" gradient rose→violet (SVG, pas de dépendance image externe)
+
+### Scripts ajoutés
+- `scripts/scrape-shotgun.py` — scraper Playwright (Shotgun bloque les headless → à retravailler)
+- `scripts/scrape-events.py` — scraper Facebook API (nécessite token FB)
+- `scripts/import-events.mjs` — import JSON → Supabase (upsert par source_id)
+
+### À FAIRE DANS SUPABASE
+- `ALTER TABLE events ADD COLUMN IF NOT EXISTS lineup TEXT[] DEFAULT '{}';`
+- `ALTER TABLE events ADD COLUMN IF NOT EXISTS source_id TEXT;` (pour import scraping)
+
+---
+
+## Features dev — Priorités restantes
+
+### Priorité 1 — Settings drawer
+- [ ] Settings drawer — redesign glassmorphism (seule vue pas encore refaite)
+
+### Priorité 2 — Contenu & onboarding
+- [ ] Ajouter 5-10 vrais events Toulouse manuellement via admin form
+- [ ] Onboarding repensé (SplashScreen — reset via `localStorage.removeItem('spottls_splash_seen')`)
+- [ ] Page profil utilisateur (check-ins, avis, historique)
+
+### Priorité 3 — Features
+- [ ] Notifications push (bar favori a un event)
+- [ ] Scraping RA.co (alternative à Shotgun, plus ouvert)
+- [ ] Spot Boost en self-service (bar paie en ligne)
+
+---
+
+## Infos techniques clés
+
+- **Supabase URL** : https://nnxuewtauidiwrvxjbtr.supabase.co
+- **Déploiement** : Vercel auto depuis branch `main`
+- **URL prod** : https://spot-tls.vercel.app
+- **Logo** : `public/logo.svg` — texte "spot" gradient rose→violet (height: 26px auto dans TopBar)
+- **Font** : Clash Display (Fontshare CDN) + Space Grotesk fallback
+- **Icons** : Lucide React (installé)
+- **Règle critique** : pas de JOIN Supabase checkins/reviews → spots (spot_id TEXT sans FK)
+- **Écriture fichiers** : >200 lignes sur Google Drive → utiliser python3 script (voir `scripts/write_css.py` comme exemple)
+- **Commits** : c'est l'utilisateur qui fait git add / commit / push — Claude prépare seulement les commandes

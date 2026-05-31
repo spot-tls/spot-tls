@@ -1,3 +1,7 @@
+import os
+root = r'C:\Users\basti\Google Drive\marketing\SPOT cabau lesavre\Mise en route\APP\spot-app-v2\src'
+
+homeview_jsx = """\
 import { useMemo, useState, useCallback } from 'react';
 import { MOODS, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
@@ -363,3 +367,8 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
     </div>
   );
 }
+"""
+
+with open(os.path.join(root, 'components', 'HomeView', 'HomeView.jsx'), 'w', encoding='utf-8') as f:
+    f.write(homeview_jsx)
+print(f"HomeView.jsx written ({len(homeview_jsx.splitlines())} lines)")

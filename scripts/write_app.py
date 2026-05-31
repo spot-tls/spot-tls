@@ -1,3 +1,8 @@
+import os
+root = r'C:\Users\basti\Google Drive\marketing\SPOT cabau lesavre\Mise en route\APP\spot-app-v2\src'
+
+# ── App.jsx ──────────────────────────────────────────────────────────────────
+app_jsx = """\
 import { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import TopBar    from './components/Layout/TopBar';
 import BottomNav from './components/Layout/BottomNav';
@@ -251,3 +256,8 @@ export default function App() {
     </div>
   );
 }
+"""
+
+with open(os.path.join(root, 'App.jsx'), 'w', encoding='utf-8') as f:
+    f.write(app_jsx)
+print(f"App.jsx written ({len(app_jsx.splitlines())} lines)")

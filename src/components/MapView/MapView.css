@@ -718,4 +718,5 @@
   gap: 5px;
   padding: 7px 12px;
   border-radius: 20px;
-  border: 1.5px solid var(--border
+  border: 1.5px solid var(--border);
+}

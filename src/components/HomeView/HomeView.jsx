@@ -52,8 +52,8 @@ function SpotCard({ spot, onClick, userPos, index = 0 }) {
       <div className="hv-spot-info">
         <div className="hv-spot-name">{spot.name}</div>
         <div className="hv-spot-meta-row">
-          <span className="hv-spot-cat-chip" style={{ color: cat.color, background: cat.color + '18' }}>
-            {cat.emoji} {spot.category}
+          <span className="hv-spot-cat-chip" style={{ color: cat.color, background: cat.color + '1A', border: `1px solid ${cat.color}30` }}>
+            {spot.category}
           </span>
           {rating && <span className="hv-spot-rating">★ {rating.toFixed(1)}</span>}
         </div>

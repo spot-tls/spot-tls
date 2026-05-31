@@ -22,8 +22,9 @@
 /* ── Brand ── */
 .topbar-brand {
   display: flex;
-  flex-direction: column;
-  gap: 1px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   line-height: 1;
   background: none;
   border: none;
@@ -34,6 +35,15 @@
 }
 .topbar-brand:hover { opacity: 0.8; }
 .topbar-brand:active { opacity: 0.6; }
+
+/* Logo image */
+.topbar-logo-img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 8px rgba(240,81,159,0.5));
+}
 
 .topbar-logo {
   display: flex;

@@ -5,10 +5,11 @@ export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents,
   return (
     <header className="topbar">
       <button className="topbar-brand" onClick={onGoMap} aria-label="Retour à la carte">
-        <div className="topbar-logo">
-          <span className="topbar-logo-spot">Spot</span>
-          <span className="topbar-logo-fr">TLS</span>
-        </div>
+        <img
+          src="/logo.png"
+          alt="Spot"
+          className="topbar-logo-img"
+        />
         <span className="topbar-city">Toulouse</span>
       </button>
 

@@ -35,6 +35,7 @@ export default function App() {
   const [showBeta,       setShowBeta]       = useState(false);
   const [showSplash,     setShowSplash]     = useState(() => {
     if (SHARE_SPOT_ID || SHARE_EVENT_ID || IS_AUTH_CALLBACK) return false;
+    // Pour tester l'onboarding : vide le cache → localStorage.removeItem('spottls_splash_seen')
     return !localStorage.getItem('spottls_splash_seen');
   });
   const [showEvents,     setShowEvents]     = useState(false);

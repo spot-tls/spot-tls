@@ -226,10 +226,12 @@
 .hv-scroll-row {
   display: flex;
   gap: 14px;
-  padding: 0 20px 4px;
+  padding: 0 20px 12px;
   overflow-x: auto;
+  overflow-y: visible;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
 }
 .hv-scroll-row::-webkit-scrollbar { display: none; }
 
@@ -526,10 +528,12 @@
 .hv-nearby-row {
   display: flex;
   gap: 14px;
-  padding: 0 20px 4px;
+  padding: 0 20px 12px;
   overflow-x: auto;
+  overflow-y: visible;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
 }
 .hv-nearby-row::-webkit-scrollbar { display: none; }
 

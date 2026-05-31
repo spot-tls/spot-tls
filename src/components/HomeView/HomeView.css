@@ -346,6 +346,9 @@
 
 /* ── Featured Event ── */
 .hv-ev-featured {
+  background: linear-gradient(160deg, #1a1035, #2d1052, #3b0764);
+  background-size: cover;
+  background-position: center;
   display: block;
   width: calc(100% - 40px);
   margin: 0 20px 6px;

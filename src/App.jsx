@@ -28,12 +28,18 @@ const IS_AUTH_CALLBACK = window.location.hash.includes('access_token') || window
 export default function App() {
   const [activePage,      setActivePage]      = useState('home');
   const [showBeta,        setShowBeta]        = useState(false);
-  const [showSplash,      setShowSplash]      = useState(!SHARE_SPOT_ID && !IS_AUTH_CALLBACK);
+  const [showSplash,      setShowSplash]      = useState(() => {
+    if (SHARE_SPOT_ID || IS_AUTH_CALLBACK) return false;
+    return !localStorage.getItem('spottls_splash_seen');
+  });
   const [showEvents,      setShowEvents]      = useState(false);
   const [showAuth,        setShowAuth]        = useState(false);
   const [showSettings,    setShowSettings]    = useState(false);
   const [shareDismissed,  setShareDismissed]  = useState(false);
-  const dismissSplash = () => setShowSplash(false);
+  const dismissSplash = () => {
+    localStorage.setItem('spottls_splash_seen', '1');
+    setShowSplash(false);
+  };
 
   const { spots, loading, error, removeSpot, moveSpot }    = useSpots();
   const [repositioningSpot, setRepositioningSpot]          = useState(null);
@@ -53,7 +59,6 @@ export default function App() {
 
   const goMap  = () => setActivePage('map');
 
-  // Si l'user vient de cliquer un lien magic link → afficher le modal profil si besoin
   const handleRequireAuth = () => setShowAuth(true);
 
   const centerScreen = (children) => (
@@ -155,7 +160,6 @@ export default function App() {
               userPos={userPos}
               onRequireAuth={handleRequireAuth}
               onOpenSpot={(spot) => {
-                // Navigate to map and open spot detail
                 setActivePage('map');
               }}
             />
@@ -165,11 +169,10 @@ export default function App() {
 
       <BottomNav activePage={activePage} onChange={setActivePage} favCount={count} />
 
-      {/* ── Modals ── */}
+      {/* Modals */}
       {showBeta     && <BetaModal onClose={() => setShowBeta(false)} />}
       {showEvents   && <EventsView onClose={() => setShowEvents(false)} admin={admin} />}
 
-      {/* Auth — apparaît si besoin de connexion OU si le user vient d'un magic link et n'a pas de profil */}
       {(showAuth || needsProfile) && (
         <AuthModal
           onClose={() => setShowAuth(false)}
@@ -181,7 +184,6 @@ export default function App() {
         />
       )}
 
-      {/* Settings drawer */}
       {showSettings && (
         <SettingsDrawer
           onClose={() => setShowSettings(false)}

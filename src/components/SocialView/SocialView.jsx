@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { MapPin, PenLine, MessageCircle, RefreshCw, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { getCatConfig } from '../../utils/config';
 import { isOpenNow } from '../../utils/isOpenNow';
@@ -304,7 +305,7 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
           </div>
         ) : (
           <div className="sv-login-prompt">
-            <span className="sv-login-icon">👤</span>
+            <span className="sv-login-icon"><User size={22} strokeWidth={1.8} /></span>
             <div>
               <div className="sv-login-title">Rejoins la communauté</div>
               <div className="sv-login-sub">Check-in, note tes soirées, partage avec Toulouse</div>
@@ -318,14 +319,14 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
 
       <div className="sv-actions">
         <button className="sv-action-btn sv-action-checkin" onClick={() => currentUser ? setShowCheckinPicker(true) : onRequireAuth()}>
-          📍 J'y suis !
+          <MapPin size={15} strokeWidth={2} /> J'y suis !
         </button>
         <button className="sv-action-btn sv-action-review" onClick={() => {
           if (!currentUser) { onRequireAuth(); return; }
           if (activeCheckin && activeSpot) { setReviewTarget({ spot: activeSpot, checkinId: activeCheckin.id }); }
           else { setReviewAfterCheckin(true); setShowCheckinPicker(true); }
         }}>
-          ✍️ Laisser un avis
+          <PenLine size={15} strokeWidth={2} /> Laisser un avis
         </button>
       </div>
 
@@ -335,8 +336,11 @@ export default function SocialView({ currentUser, currentProfile, spots, userPos
       )}
 
       <div className="sv-feed-header">
-        <span className="sv-feed-title">🗣️ Ce que dit la communauté</span>
-        <button className="sv-refresh-btn" onClick={loadFeed}>↻</button>
+        <span className="sv-feed-title">
+          <MessageCircle size={16} strokeWidth={2} className="sv-feed-title-icon" />
+          Ce que dit la communauté
+        </span>
+        <button className="sv-refresh-btn" onClick={loadFeed}><RefreshCw size={15} strokeWidth={2} /></button>
       </div>
 
       {loading ? (

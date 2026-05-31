@@ -1,5 +1,5 @@
 /* ──────────────────────────────────────
-   FavoritesView — SpotFR
+   FavoritesView — SpotTLS
    ────────────────────────────────────── */
 .favview {
   position: absolute;
@@ -13,28 +13,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 14px 16px 0;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(167,139,250,0.1));
-  border: 1px solid rgba(167, 139, 250, 0.2);
-  border-radius: var(--radius-md);
+  margin: 16px 16px 0;
+  padding: 18px 20px;
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 30px rgba(240,81,159,0.05);
   flex-shrink: 0;
 }
-
 .favview-hero-title {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text);
+  font-family: var(--font-title);
   margin: 0;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-
 .favview-hero-sub {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 3px;
 }
-
 .favview-hero-count {
   font-size: 36px;
   font-weight: 800;
@@ -56,7 +61,26 @@
 }
 .favview-filters::-webkit-scrollbar { display: none; }
 
-/* hérite .sort-pill depuis SearchView.css via le design system */
+.sort-pill {
+  padding: 7px 15px;
+  border-radius: 99px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-muted);
+  font-size: 13px; font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.sort-pill.active {
+  border-color: rgba(240,81,159,0.45);
+  color: var(--primary);
+  background: rgba(240,81,159,0.1);
+}
+.sort-pill:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Liste ── */
 .favview-list {
@@ -77,32 +101,28 @@
   gap: 6px;
   padding: 28px 0 0;
 }
-
 .favview-empty-ring {
-  width: 72px;
-  height: 72px;
+  width: 76px; height: 76px;
   border-radius: 50%;
-  border: 2px dashed rgba(167, 139, 250, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid rgba(240,81,159,0.2);
+  background: rgba(240,81,159,0.06);
+  display: flex; align-items: center; justify-content: center;
   font-size: 30px;
   margin-bottom: 6px;
   animation: pulse-dot 3s ease-in-out infinite;
+  box-shadow: 0 0 24px rgba(240,81,159,0.1);
 }
-
+@keyframes pulse-dot {
+  0%,100% { box-shadow: 0 0 24px rgba(240,81,159,0.1); }
+  50%      { box-shadow: 0 0 36px rgba(240,81,159,0.2); }
+}
 .favview-empty-title {
   font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--text);
+  font-weight: 700; font-size: 18px; color: var(--text);
 }
-
 .favview-empty-sub {
-  font-size: 14px;
-  color: var(--text-muted);
-  max-width: 240px;
-  line-height: 1.5;
+  font-size: 14px; color: var(--text-muted);
+  max-width: 240px; line-height: 1.5;
 }
 
 /* ── Suggestions ── */
@@ -111,19 +131,15 @@
   margin-top: 20px;
   text-align: left;
 }
-
 .favview-suggestions-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11px; font-weight: 700;
   color: var(--text-muted);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  padding: 0 2px;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 10px; padding: 0 2px;
 }
-
 .favview-cta {
-  margin-top: 16px;
-  font-size: 14px;
-  padding: 12px 24px;
+  margin-top: 16px; font-size: 14px; padding: 12px 24px;
+  border-radius: 99px; background: var(--gradient-brand);
+  color: #fff; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 16px var(--neon-pink);
 }

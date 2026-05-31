@@ -6,7 +6,7 @@ export default function TopBar({ onJoinBeta, theme, onToggleTheme, onOpenEvents,
     <header className="topbar">
       <button className="topbar-brand" onClick={onGoMap} aria-label="Retour à la carte">
         <img
-          src="/logo.png"
+          src="/logo.svg"
           alt="Spot"
           className="topbar-logo-img"
         />

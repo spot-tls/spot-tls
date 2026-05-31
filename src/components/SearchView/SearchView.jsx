@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef } from 'react';
+import { Search, X } from 'lucide-react';
 import { MOODS, CATEGORY_CONFIG, getCatConfig, matchMood, QUARTIER_COLORS } from '../../utils/config';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import { isOpenNow } from '../../utils/isOpenNow';
@@ -167,7 +168,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
         {searchOpen ? (
           <div className="ds-search-expanded">
             <div className="ds-search-field">
-              <span className="ds-search-icon">🔍</span>
+              <Search size={15} strokeWidth={2} className="ds-search-icon" />
               <input
                 ref={inputRef}
                 autoFocus
@@ -175,7 +176,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Spot, quartier, ambiance…"
               />
-              {query && <button className="ds-search-clear" onClick={() => setQuery('')}>×</button>}
+              {query && <button className="ds-search-clear" onClick={() => setQuery('')}><X size={13} strokeWidth={2.5} /></button>}
             </div>
             <button className="ds-search-cancel" onClick={() => { setSearchOpen(false); setQuery(''); }}>Annuler</button>
           </div>
@@ -190,7 +191,7 @@ export default function SearchView({ spots, isFavorite, onToggleFavorite, userPo
                 <button className="ds-topbar-clear" onClick={clearAll}>Effacer</button>
               )}
               <button className="ds-search-btn" onClick={() => { setSearchOpen(true); setTimeout(() => inputRef.current?.focus(), 50); }}>
-                <span>🔍</span>
+                <Search size={17} strokeWidth={2} />
               </button>
             </div>
           </div>

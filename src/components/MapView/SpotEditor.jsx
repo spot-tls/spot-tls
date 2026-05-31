@@ -3,9 +3,9 @@
  * S'ouvre depuis SpotDetail via le bouton ✏️.
  * Les modifications sont sauvegardées en localStorage (via saveEdit).
  */
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { updateSpot } from '../../lib/supabaseAdmin';
+import { updateSpot, supabaseAdmin } from '../../lib/supabaseAdmin';
 import './SpotEditor.css';
 
 const DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
@@ -38,8 +38,12 @@ export default function SpotEditor({ spot, onClose, onSave, admin }) {
     vibe_tags:       (spot.vibe_tags || []).join(', '),
     hours:           spot.hours ? JSON.parse(JSON.stringify(spot.hours)) : Object.fromEntries(DAYS.map(d => [d, null])),
     photo_url:       spot.photo_url || '',
+    photos:          Array.from(spot.photos || []),
   });
-  const [saving, setSaving] = useState(false);
+  const [saving,      setSaving]      = useState(false);
+  const [uploading,   setUploading]   = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const fileRef = useRef(null);
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
@@ -57,6 +61,31 @@ export default function SpotEditor({ spot, onClose, onSave, admin }) {
       return { ...f, hours };
     });
   };
+
+  const uploadPhoto = async (file) => {
+    if (!file) return;
+    setUploadError('');
+    setUploading(true);
+    try {
+      const ext  = file.name.split('.').pop();
+      const path = `spots/${spot.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabaseAdmin.storage
+        .from('spot-photos')
+        .upload(path, file, { cacheControl: '3600', upsert: false });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabaseAdmin.storage
+        .from('spot-photos')
+        .getPublicUrl(path);
+      set('photos', [...form.photos, urlData.publicUrl]);
+    } catch (e) {
+      setUploadError(e.message || 'Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  const removePhoto = (url) => set('photos', form.photos.filter(u => u !== url));
 
   const handleSave = async () => {
     const vibe_tags = form.vibe_tags
@@ -76,6 +105,7 @@ export default function SpotEditor({ spot, onClose, onSave, admin }) {
       vibe_tags,
       hours:           form.hours,
       photo_url:       form.photo_url.trim(),
+      photos:          form.photos,
     };
 
     setSaving(true);
@@ -148,21 +178,44 @@ export default function SpotEditor({ spot, onClose, onSave, admin }) {
               />
             </Field>
 
-            <Field label="🖼️ Photo URL">
+            <Field label="🖼️ Photos">
+              {/* Grille des photos existantes */}
+              {form.photos.length > 0 && (
+                <div className="spe-photos-grid">
+                  {form.photos.map((url) => (
+                    <div key={url} className="spe-photo-thumb">
+                      <img src={url} alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+                      <button className="spe-photo-remove" onClick={() => removePhoto(url)}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Bouton upload */}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => uploadPhoto(e.target.files[0])}
+              />
+              <button
+                className="spe-upload-btn"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? '⏳ Upload en cours…' : '📷 Ajouter une photo'}
+              </button>
+              {uploadError && <p className="spe-upload-error">{uploadError}</p>}
+
+              {/* Photo URL manuelle (fallback) */}
               <input
                 className="spe-input"
                 value={form.photo_url}
                 onChange={(e) => set('photo_url', e.target.value)}
-                placeholder="https://images.unsplash.com/…"
+                placeholder="ou coller une URL directement…"
+                style={{ marginTop: 4 }}
               />
-              {form.photo_url && (
-                <img
-                  src={form.photo_url}
-                  alt="preview"
-                  style={{ marginTop: 8, width: '100%', height: 120, objectFit: 'cover', borderRadius: 10 }}
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
-              )}
             </Field>
           </div>
 

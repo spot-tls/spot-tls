@@ -3,29 +3,41 @@
    ───────────────────────────────────────────────────────────── */
 :root,
 [data-theme='dark'] {
-  /* Surfaces */
-  --bg:           #0F0E15;
-  --bg-elevated:  #1A1825;
-  --bg-soft:      #15121F;
+  /* Surfaces — noir chaud teinte violet/rose néon */
+  --bg:           #08061A;
+  --bg-elevated:  #110D22;
+  --bg-soft:      #0C0918;
+  --bg-card:      #130F24;
 
   /* Brand */
-  --primary:      #EC4899;
+  --primary:      #F0519F;
   --secondary:    #A78BFA;
-  --gradient-brand: linear-gradient(135deg, #EC4899, #A78BFA);
+  --gradient-brand: linear-gradient(135deg, #F0519F 0%, #A78BFA 100%);
+  --gradient-brand-intense: linear-gradient(135deg, #FF3D9A 0%, #8B5CF6 100%);
+
+  /* Glassmorphism */
+  --glass-card:   rgba(18, 10, 38, 0.72);
+  --glass-border: rgba(167, 139, 250, 0.18);
+  --glass-border-bright: rgba(240, 81, 159, 0.25);
+  --glass-blur:   blur(16px);
+
+  /* Neon glows */
+  --neon-pink:    rgba(240, 81, 159, 0.35);
+  --neon-violet:  rgba(139, 92, 246, 0.3);
 
   /* Status */
   --green:        #4ade80;
   --green-soft:   rgba(74, 222, 128, 0.15);
 
   /* Text */
-  --text:         #F5F0FF;
-  --text-dim:     #B8B2CC;
-  --text-muted:   #6B6880;
+  --text:         #F8F3FF;
+  --text-dim:     #B8AEDD;
+  --text-muted:   #6B6080;
 
   /* Lines / glass */
-  --border:       rgba(255, 255, 255, 0.08);
-  --glass:        rgba(15, 14, 21, 0.85);
-  --glass-soft:   rgba(26, 24, 37, 0.7);
+  --border:       rgba(255, 255, 255, 0.07);
+  --glass:        rgba(8, 6, 26, 0.88);
+  --glass-soft:   rgba(17, 13, 34, 0.75);
 
   /* Radii */
   --radius-pill:  9999px;
@@ -33,7 +45,7 @@
   --radius-md:    16px;
 
   /* Fonts */
-  --font-title: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-title: 'Clash Display', 'Space Grotesk', 'Bricolage Grotesque', system-ui, sans-serif;
   --font-body:  'DM Sans', system-ui, -apple-system, sans-serif;
 
   /* Layout — inclut safe area iOS */

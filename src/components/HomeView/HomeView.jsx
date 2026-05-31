@@ -17,10 +17,10 @@ const EV_CAT_EMOJI = {
 
 function greeting() {
   const h = new Date().getHours();
-  if (h < 6)  return { text: 'Bonne nuit 🌙', sub: "Les spots les plus tardifs t'attendent" };
-  if (h < 12) return { text: 'Bonjour ☀️',   sub: 'Brunch, café, que du bon à Toulouse' };
-  if (h < 18) return { text: 'Bonne journée 🌤️', sub: 'Prépare ta soirée dès maintenant' };
-  return { text: 'Ce soir à Toulouse 🔥', sub: 'Trouve le spot parfait pour ta nuit' };
+  if (h < 6)  return { text: 'Bonne nuit', sub: "Les spots les plus tardifs t'attendent" };
+  if (h < 12) return { text: 'Bonjour', sub: 'Brunch, café, que du bon à Toulouse' };
+  if (h < 18) return { text: 'Bonne journée', sub: 'Prépare ta soirée dès maintenant' };
+  return { text: 'Ce soir à Toulouse', sub: 'Trouve le spot parfait pour ta nuit' };
 }
 
 /* ── SpotCard — carte verticale photo-forward ── */
@@ -55,7 +55,7 @@ function SpotCard({ spot, onClick, userPos, index = 0 }) {
           <span className="hv-spot-cat-chip" style={{ color: cat.color, background: cat.color + '18' }}>
             {cat.emoji} {spot.category}
           </span>
-          {rating && <span className="hv-spot-rating">⭐ {rating.toFixed(1)}</span>}
+          {rating && <span className="hv-spot-rating">★ {rating.toFixed(1)}</span>}
         </div>
         <div className="hv-spot-footer-row">
           {spot.quartier && (
@@ -63,7 +63,7 @@ function SpotCard({ spot, onClick, userPos, index = 0 }) {
               {spot.quartier}
             </span>
           )}
-          {dist != null && <span className="hv-spot-dist">📍 {formatDistance(dist)}</span>}
+          {dist != null && <span className="hv-spot-dist">{formatDistance(dist)}</span>}
         </div>
       </div>
     </button>
@@ -95,13 +95,13 @@ function NearbyCard({ spot, onClick, userPos, index = 0 }) {
           {open === true  && <span className="hv-badge hv-badge-open">● Ouvert</span>}
           {open === false && <span className="hv-badge hv-badge-closed">Fermé</span>}
           {spot.google_rating && (
-            <span className="hv-nearby-rating">⭐ {spot.google_rating.toFixed(1)}</span>
+            <span className="hv-nearby-rating">★ {spot.google_rating.toFixed(1)}</span>
           )}
         </div>
         <div className="hv-nearby-bottom">
           <div className="hv-nearby-name">{spot.name}</div>
           <div className="hv-nearby-meta">
-            {dist != null && <span>📍 {formatDistance(dist)}</span>}
+            {dist != null && <span>{formatDistance(dist)}</span>}
             {spot.quartier && <span style={{ color: qColor }}>{spot.quartier}</span>}
           </div>
         </div>
@@ -126,7 +126,7 @@ function FeaturedEventCard({ event, onOpen }) {
         </div>
         <div className="hv-ev-featured-title">{event.title}</div>
         <div className="hv-ev-featured-meta">
-          📍 {event.spot_name}
+          {event.spot_name}
           {event.quartier ? ` · ${event.quartier}` : ''}
           <span style={{ color, fontWeight: 600 }}> · {event.time_start}</span>
         </div>
@@ -143,7 +143,7 @@ function EventRow({ event, onOpen }) {
       <div className="hv-ev-row-icon" style={{ background: color + '20' }}>{emoji}</div>
       <div className="hv-ev-row-body">
         <div className="hv-ev-row-title">{event.title}</div>
-        <div className="hv-ev-row-meta">📍 {event.spot_name} · <span style={{ color }}>{event.time_start}</span></div>
+        <div className="hv-ev-row-meta">{event.spot_name} · <span style={{ color }}>{event.time_start}</span></div>
       </div>
       <span className="hv-ev-row-chevron">›</span>
     </button>
@@ -241,11 +241,11 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
         <div className="hv-greeting">{text}</div>
         <div className="hv-greeting-sub">{sub}</div>
         <div className="hv-hero-actions">
-          <button className="hv-cta-map" onClick={onGoMap}>🗺️ Explorer</button>
+          <button className="hv-cta-map" onClick={onGoMap}>Explorer</button>
           <button
             className={`hv-cta-surprise${surpriseAnim ? ' anim' : ''}`}
             onClick={handleSurprise}
-          >🎲 Surprise</button>
+          >Surprise</button>
         </div>
       </div>
 
@@ -295,12 +295,12 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       {/* ══ AUTOUR DE MOI — grandes cartes photo ══ */}
       <div className="hv-section">
         <div className="hv-section-header">
-          <span className="hv-section-title">📍 Autour de toi</span>
+          <span className="hv-section-title">Autour de toi</span>
           {userPos && <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>}
         </div>
         {!userPos ? (
           <button className="hv-locate-btn" onClick={onLocate} disabled={geoStatus === 'loading'}>
-            {geoStatus === 'loading' ? '⏳ Localisation…' : '📍 Activer ma position'}
+            {geoStatus === 'loading' ? 'Localisation…' : 'Activer ma position'}
           </button>
         ) : nearbySpots.length === 0 ? (
           <div className="hv-empty">
@@ -320,7 +320,7 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       {featuredEvent && (
         <div className="hv-section">
           <div className="hv-section-header">
-            <span className="hv-section-title">🎫 Ce soir à Toulouse</span>
+            <span className="hv-section-title">Ce soir à Toulouse</span>
             <button className="hv-section-link" onClick={onOpenEvents}>Agenda</button>
           </div>
           <FeaturedEventCard event={featuredEvent} onOpen={onOpenEvents} />
@@ -336,7 +336,7 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
       {topSpots.length > 0 && (
         <div className="hv-section">
           <div className="hv-section-header">
-            <span className="hv-section-title">❤️ Coups de cœur Toulouse</span>
+            <span className="hv-section-title">Coups de cœur Toulouse</span>
             <button className="hv-section-link" onClick={onGoMap}>Voir carte</button>
           </div>
           <div className="hv-scroll-row">

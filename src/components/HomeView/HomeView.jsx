@@ -4,15 +4,13 @@ import { isOpenNow } from '../../utils/isOpenNow';
 import { distanceKm, formatDistance } from '../../utils/distance';
 import { useEvents } from '../../hooks/useEvents';
 import SpotDetail from '../MapView/SpotDetail';
+import EventDetail from '../EventDetail/EventDetail';
 import './HomeView.css';
 
 const EV_CAT_COLOR = {
   'DJ Set': '#A78BFA', 'Concert': '#FB7185', 'Happy Hour': '#06B6D4',
   'Soirée': '#EC4899', 'Brunch': '#4ade80', 'Expo': '#FBBF24',
-};
-const EV_CAT_EMOJI = {
-  'DJ Set': '🎛️', 'Concert': '🎤', 'Happy Hour': '🍹',
-  'Soirée': '🎉', 'Brunch': '☕', 'Expo': '🎭',
+  'Afterwork': '#F59E0B',
 };
 
 function greeting() {
@@ -113,7 +111,6 @@ function NearbyCard({ spot, onClick, userPos, index = 0 }) {
 /* ── Featured Event Card ── */
 function FeaturedEventCard({ event, onOpen }) {
   const color = EV_CAT_COLOR[event.category] || '#A78BFA';
-  const emoji = EV_CAT_EMOJI[event.category] || '📅';
   const bg    = event.photo_url
     ? `url(${event.photo_url}) center/cover no-repeat`
     : `linear-gradient(160deg,#1a1035,#2d1052,#3b0764)`;
@@ -121,8 +118,8 @@ function FeaturedEventCard({ event, onOpen }) {
     <button className="hv-ev-featured" style={{ background: bg }} onClick={onOpen}>
       <div className="hv-ev-featured-overlay">
         <div className="hv-ev-featured-top">
-          <span className="hv-ev-chip" style={{ color, background: color + '22' }}>{emoji} {event.category}</span>
-          {event.featured && <span className="hv-ev-star">✨ À la une</span>}
+          <span className="hv-ev-chip" style={{ color, background: color + '22', border: `1px solid ${color}40` }}>{event.category}</span>
+          {event.featured && <span className="hv-ev-star">À la une</span>}
         </div>
         <div className="hv-ev-featured-title">{event.title}</div>
         <div className="hv-ev-featured-meta">
@@ -137,10 +134,10 @@ function FeaturedEventCard({ event, onOpen }) {
 
 function EventRow({ event, onOpen }) {
   const color = EV_CAT_COLOR[event.category] || '#A78BFA';
-  const emoji = EV_CAT_EMOJI[event.category] || '📅';
+  const initial = (event.category || '?')[0].toUpperCase();
   return (
     <button className="hv-ev-row" onClick={onOpen}>
-      <div className="hv-ev-row-icon" style={{ background: color + '20' }}>{emoji}</div>
+      <div className="hv-ev-row-icon" style={{ background: color + '20', color, border: `1px solid ${color}30` }}>{initial}</div>
       <div className="hv-ev-row-body">
         <div className="hv-ev-row-title">{event.title}</div>
         <div className="hv-ev-row-meta">{event.spot_name} · <span style={{ color }}>{event.time_start}</span></div>
@@ -167,9 +164,10 @@ function MoodChip({ mood, active, count, onClick }) {
 
 /* ══════════════════════════════════════════════ */
 export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos, geoStatus, onLocate, onGoMap, onOpenEvents, admin, onAdminReposition, onAdminDelete }) {
-  const [activeMood,   setActiveMood]   = useState(null);
-  const [selected,     setSelected]     = useState(null);
-  const [surpriseAnim, setSurpriseAnim] = useState(false);
+  const [activeMood,     setActiveMood]     = useState(null);
+  const [selected,       setSelected]       = useState(null);
+  const [selectedEvent,  setSelectedEvent]  = useState(null);
+  const [surpriseAnim,   setSurpriseAnim]   = useState(false);
   const { text, sub } = greeting();
   const { allEvents } = useEvents();
 
@@ -323,10 +321,10 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
             <span className="hv-section-title">Ce soir à Toulouse</span>
             <button className="hv-section-link" onClick={onOpenEvents}>Agenda</button>
           </div>
-          <FeaturedEventCard event={featuredEvent} onOpen={onOpenEvents} />
+          <FeaturedEventCard event={featuredEvent} onOpen={() => setSelectedEvent(featuredEvent)} />
           {otherEvents.length > 0 && (
             <div className="hv-ev-rows">
-              {otherEvents.map(e => <EventRow key={e.id} event={e} onOpen={onOpenEvents} />)}
+              {otherEvents.map(e => <EventRow key={e.id} event={e} onOpen={() => setSelectedEvent(e)} />)}
             </div>
           )}
         </div>
@@ -358,6 +356,15 @@ export default function HomeView({ spots, isFavorite, onToggleFavorite, userPos,
           userPos={userPos}
           onReposition={admin ? onAdminReposition : undefined}
           onDelete={admin ? onAdminDelete : undefined}
+        />
+      )}
+
+      {selectedEvent && (
+        <EventDetail
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          spots={spots}
+          onOpenSpot={spot => { setSelectedEvent(null); setSelected(spot); }}
         />
       )}
     </div>
